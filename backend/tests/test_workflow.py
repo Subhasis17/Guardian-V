@@ -5,6 +5,7 @@ from app import main
 
 def test_agora_saved_agent_builds_with_public_tools(monkeypatch):
     from agora_agent.agentkit.v3 import build_body
+    from agora_agent.v3.contract import validate_write
     from app.voice_config import build_guardian_agent, get_voice_profile
 
     monkeypatch.setenv("GUARDIAN_PUBLIC_API_URL", "https://guardian.example")
@@ -12,6 +13,7 @@ def test_agora_saved_agent_builds_with_public_tools(monkeypatch):
     agent = build_guardian_agent(object(), get_voice_profile("default"), "guardian_voice")
     body = build_body(agent, "Guardian")
     assert len(body["pipeline"]["llm"]["tools"]) == 8
+    validate_write("POST", "/conversational-ai/v1/projects/test-app/agents", body)
 
 
 def test_voice_diagnostics_exclude_secrets_and_require_auth(tmp_path, monkeypatch):

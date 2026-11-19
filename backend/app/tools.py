@@ -67,13 +67,15 @@ def agora_tool_definitions(public_url):
     }
     return [{
         "type": "function",
-        "function": {"name": AGORA_TOOL_NAMES[name], "description": descriptions[name], "parameters": {**model.model_json_schema(), "additionalProperties": False}},
+        "name": AGORA_TOOL_NAMES[name],
+        "description": descriptions[name],
+        "parameters": {**model.model_json_schema(), "additionalProperties": False},
         "execution": {"mode": "sync"},
         "server": {
             "method": "POST",
             "url": f"{public_url}/api/agent-tools/{AGORA_TOOL_NAMES[name]}",
             "headers": {"Authorization": f"Bearer {os.environ['DEMO_API_TOKEN']}"},
-            "body": {"arguments": "{{args}}", "tool_call_id": "{{tool_call_id}}"},
+            "body": {"arguments": {field: "{{args." + field + "}}" for field in model.model_fields}, "tool_call_id": "{{tool_call_id}}"},
             "timeout_ms": 10000,
         },
     } for name, model in CONTRACTS.items()]

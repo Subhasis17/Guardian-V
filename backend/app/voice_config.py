@@ -115,7 +115,6 @@ def build_guardian_agent(client, profile: VoiceProfile, secret_name: str):
     if public_url:
         from app.tools import agora_tool_definitions
 
-        llm_options["template_variables"] = {"guardian_token": os.environ["DEMO_API_TOKEN"]}
         llm_options["tools"] = agora_tool_definitions(public_url)
 
     agent = (
@@ -134,4 +133,4 @@ def build_guardian_agent(client, profile: VoiceProfile, secret_name: str):
         ))
         .with_greeting(profile.greeting)
     )
-    return agent.with_tools(True) if public_url else agent
+    return agent

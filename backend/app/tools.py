@@ -1,6 +1,7 @@
 """Application tool allowlist. Tools cannot grant approval."""
 
 import json
+import os
 from typing import Literal
 
 from fastapi import HTTPException
@@ -71,7 +72,7 @@ def agora_tool_definitions(public_url):
         "server": {
             "method": "POST",
             "url": f"{public_url}/api/agent-tools/{AGORA_TOOL_NAMES[name]}",
-            "headers": {"Authorization": "{{template_variables.guardian_token}}"},
+            "headers": {"Authorization": f"Bearer {os.environ['DEMO_API_TOKEN']}"},
             "body": {"arguments": "{{args}}", "tool_call_id": "{{tool_call_id}}"},
             "timeout_ms": 10000,
         },

@@ -3,6 +3,17 @@ from fastapi.testclient import TestClient
 from app import main
 
 
+def test_agora_saved_agent_builds_with_public_tools(monkeypatch):
+    from agora_agent.agentkit.v3 import build_body
+    from app.voice_config import build_guardian_agent, get_voice_profile
+
+    monkeypatch.setenv("GUARDIAN_PUBLIC_API_URL", "https://guardian.example")
+    monkeypatch.setenv("DEMO_API_TOKEN", "test-secret")
+    agent = build_guardian_agent(object(), get_voice_profile("default"), "guardian_voice")
+    body = build_body(agent, "Guardian")
+    assert len(body["pipeline"]["llm"]["tools"]) == 8
+
+
 def test_voice_diagnostics_exclude_secrets_and_require_auth(tmp_path, monkeypatch):
     with client_for(tmp_path, monkeypatch) as client:
         with main.db() as conn:

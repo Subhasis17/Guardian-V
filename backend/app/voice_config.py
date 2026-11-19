@@ -97,7 +97,7 @@ def get_voice_profile(profile_id: str):
 
 def build_guardian_agent(client, profile: VoiceProfile, secret_name: str):
     """Build the Agora agent with separately configurable ASR and Murf Falcon output."""
-    from agora_agent import Agent, DeepgramSTT, MurfTTS, OpenAI, secret_ref
+    from agora_agent import Agent, CustomLLM, DeepgramSTT, MurfTTS, secret_ref
 
     language_instruction = (
         "The speech recognizer auto-detects multilingual input, but the Murf reply voice is fixed for this session."
@@ -120,7 +120,7 @@ def build_guardian_agent(client, profile: VoiceProfile, secret_name: str):
     agent = (
         Agent(client=client)
         .with_stt(DeepgramSTT(model="nova-3", language=profile.asr_language))
-        .with_llm(OpenAI(**llm_options))
+        .with_llm(CustomLLM(**llm_options))
         .with_tts(MurfTTS(
             key=secret_ref(secret_name, "murf"),
             base_url="wss://global.api.murf.ai/v1/speech/stream-input",

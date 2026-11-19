@@ -12,6 +12,8 @@ def test_agora_saved_agent_builds_with_public_tools(monkeypatch):
     monkeypatch.setenv("DEMO_API_TOKEN", "test-secret")
     agent = build_guardian_agent(object(), get_voice_profile("default"), "guardian_voice")
     body = build_body(agent, "Guardian")
+    assert body["pipeline"]["llm"]["vendor"] == "custom"
+    assert body["pipeline"]["llm"]["url"] == "https://ai-gateway.vercel.sh/v1/chat/completions"
     assert len(body["pipeline"]["llm"]["tools"]) == 8
     validate_write("POST", "/conversational-ai/v1/projects/test-app/agents", body)
 

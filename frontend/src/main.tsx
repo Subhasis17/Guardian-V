@@ -8,9 +8,11 @@ type Action = { id: string; kind: string; title: string; status: string; result:
 type Incident = { id: string; summary: string; status: string; created_at: string };
 type Run = { sandbox: boolean; incident: Incident; plan: Action[]; audit: { action: string; detail: string; created_at: string }[] };
 type Context = { profile: { name: string; trusted_contact: string }; account: { card_frozen: boolean }; transactions: { merchant: string; amount: number; occurred_at: string; status: string; suspicious: number }[]; incidents: Incident[] };
-type VoiceSession = { session_id: string; app_id: string; channel: string; uid: number; rtc_rtm_token: string };
+type VoiceProfile = { id: string; label: string; asr_language: string; tts_locale: string; reply_language: string; greeting: string; auto_detect_input: boolean };
+type VoiceConfig = { default_profile_id: string; profiles: VoiceProfile[] };
+type VoiceSession = { session_id: string; app_id: string; channel: string; uid: number; rtc_rtm_token: string; profile_id: string; profile_label: string };
 type Transcript = { role: string; content: string };
-const API = "http://127.0.0.1:8000";
+const API = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8000").replace(/\/$/, "");
 
 function App() {
   const [token, setToken] = useState(sessionStorage.getItem("guardian-token") ?? "");
@@ -21,7 +23,12 @@ function App() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [voiceStatus, setVoiceStatus] = useState("Voice is ready");
+  const [voiceConfig, setVoiceConfig] = useState<VoiceConfig | null>(null);
+  const [voiceProfileId, setVoiceProfileId] = useState("default");
   const [transcripts, setTranscripts] = useState<Transcript[]>([]);
+  const [diagnosticId, setDiagnosticId] = useState("");
+  const [diagnostics, setDiagnostics] = useState<{session: {status: string}; events: {event: string; created_at: string}[]} | null>(null);
+  const [diagnosticError, setDiagnosticError] = useState("");
   const voiceSession = useRef<VoiceSession | null>(null);
   const rtcClient = useRef<IAgoraRTCClient | null>(null);
   const micTrack = useRef<IMicrophoneAudioTrack | null>(null);
@@ -33,6 +40,27 @@ function App() {
     return response.json();
   }
 
+  function logVoice(event: string, id = voiceSession.current?.session_id) {
+    if (id) void request(`/api/voice/sessions/${id}/events`, {method: "POST", body: JSON.stringify({event})}).catch(() => setDiagnosticError("Some diagnostic events could not be saved."));
+  }
+
+  useEffect(() => {
+    if (!diagnosticId || !token) return;
+    let cancelled = false;
+    async function refresh() {
+      try {
+        const data = await request<any>(`/api/voice/sessions/${diagnosticId}/diagnostics`);
+        if (!cancelled) setDiagnostics(data);
+        if (voiceSession.current?.session_id === diagnosticId) {
+          await request(`/api/voice/sessions/${diagnosticId}`);
+        }
+      } catch { if (!cancelled) setDiagnosticError("Session status or diagnostics unavailable. Voice may still be connected."); }
+    }
+    void refresh();
+    const timer = window.setInterval(() => void refresh(), 10000);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, [diagnosticId, token]);
+
   async function loadContext() {
     if (!token) return;
     try { setContext(await request<Context>("/api/context")); setError(""); }
@@ -40,6 +68,13 @@ function App() {
   }
 
   useEffect(() => { void loadContext(); }, [token]);
+
+  useEffect(() => {
+    if (!token) return;
+    request<VoiceConfig>("/api/voice/config")
+      .then(config => { setVoiceConfig(config); setVoiceProfileId(config.default_profile_id); })
+      .catch(e => setError(e instanceof Error ? e.message : "Could not load voice configuration."));
+  }, [token]);
 
   async function connect() {
     setToken(tokenInput.trim());
@@ -83,34 +118,42 @@ function App() {
     let prepared: VoiceSession | null = null;
     try {
       const [{ default: AgoraRTC }, { default: AgoraRTM }] = await Promise.all([import("agora-rtc-sdk-ng"), import("agora-rtm")]);
-      prepared = await request<VoiceSession>("/api/voice/session", { method: "POST", body: "{}" });
+      prepared = await request<VoiceSession>("/api/voice/session", { method: "POST", body: JSON.stringify({ profile_id: voiceProfileId }) });
       voiceSession.current = prepared;
+      setDiagnosticId(prepared.session_id); setDiagnostics(null); setDiagnosticError("");
       const rtc = AgoraRTC.createClient({ mode: "rtc", codec: "vp8" });
+      rtc.on("connection-state-change", state => { if (state === "DISCONNECTED") logVoice("rtc_disconnected", prepared?.session_id); });
       rtc.on("user-published", async (user, mediaType) => {
-        await rtc.subscribe(user, mediaType);
-        if (mediaType === "audio") user.audioTrack?.play();
+        try {
+          await rtc.subscribe(user, mediaType);
+          if (mediaType === "audio" && user.audioTrack) { user.audioTrack.play(); logVoice("remote_audio_play_requested", prepared?.session_id); }
+        } catch { logVoice("remote_audio_failed", prepared?.session_id); }
       });
       await rtc.join(prepared.app_id, prepared.channel, prepared.rtc_rtm_token, prepared.uid);
-      rtcClient.current = rtc;
+      rtcClient.current = rtc; logVoice("rtc_joined");
       const mic = await AgoraRTC.createMicrophoneAudioTrack();
       micTrack.current = mic;
-      await rtc.publish(mic);
+      await rtc.publish(mic); logVoice("mic_published");
       const rtm = new AgoraRTM.RTM(prepared.app_id, String(prepared.uid));
       await rtm.login({ token: prepared.rtc_rtm_token });
-      await rtm.subscribe(prepared.channel);
+      await rtm.subscribe(prepared.channel); logVoice("rtm_connected");
       rtm.addEventListener("message", (event) => {
-        if (event.channelName !== prepared?.channel || typeof event.message !== "string") return;
+        if (event.channelName !== prepared?.channel) return;
+        logVoice("message_received", prepared?.session_id);
         try {
-          const data = JSON.parse(event.message);
-          const pieces = Array.isArray(data.transcript) ? data.transcript : Array.isArray(data.payload?.transcript) ? data.payload.transcript : [];
-          const next = pieces.filter((item: any) => typeof item.content === "string" && ["user", "assistant"].includes(item.role)).map((item: any) => ({ role: item.role, content: item.content }));
-          if (next.length) setTranscripts(current => [...current, ...next]);
+          const raw = typeof event.message === "string" ? event.message : new TextDecoder().decode(event.message);
+          const data = JSON.parse(raw);
+          const candidates = [data, data.payload, data.data, data.transcript, data.payload?.transcript, data.data?.transcript].flatMap((value: any) => Array.isArray(value) ? value : value ? [value] : []);
+          const next = candidates.filter((item: any) => typeof item?.text === "string" || typeof item?.content === "string").map((item: any) => ({ role: item.role ?? (String(item.uid) === String(prepared?.uid) || String(item.uid) === "0" ? "user" : "assistant"), content: item.text ?? item.content })).filter((item: Transcript) => item.content.trim());
+          if (next.length) { setTranscripts(current => [...current, ...next]); logVoice("transcript_received", prepared?.session_id); }
+          else logVoice("transcript_unrecognized", prepared?.session_id);
         } catch { /* Ignore non-transcript RTM events. */ }
       });
       rtmClient.current = rtm;
       await request(`/api/voice/sessions/${prepared.session_id}/start`, { method: "POST", body: "{}" });
-      setVoiceStatus("Connected · Agora Conversational AI with Murf Falcon");
+      setVoiceStatus(`Connected · ${prepared.profile_label} · Murf Falcon`);
     } catch (e) {
+      logVoice("agent_start_failed", prepared?.session_id);
       if (prepared) void request(`/api/voice/sessions/${prepared.session_id}/stop`, { method: "POST", body: "{}" }).catch(() => undefined);
       micTrack.current?.stop(); micTrack.current?.close(); micTrack.current = null;
       await rtcClient.current?.leave().catch(() => undefined); rtcClient.current = null;
@@ -124,7 +167,7 @@ function App() {
     const active = voiceSession.current;
     setBusy(true);
     try { if (active) await request(`/api/voice/sessions/${active.session_id}/stop`, { method: "POST", body: "{}" }); }
-    catch (e) { setError(e instanceof Error ? e.message : "Could not stop the voice session."); }
+    catch (e) { logVoice("stop_failed", active?.session_id); setError(e instanceof Error ? e.message : "Could not stop the voice session."); }
     finally {
       micTrack.current?.stop(); micTrack.current?.close(); micTrack.current = null;
       await rtcClient.current?.leave().catch(() => undefined); rtcClient.current = null;
@@ -146,9 +189,10 @@ function App() {
 
     {token && <>
       <section className="voice-card"><div className="voice-copy"><span className="live-label"><i /> {voiceStatus.toUpperCase()}</span><h2>Talk it through.</h2><p>Use the live Agora voice session, or describe what happened below to create an incident plan.</p>
-        <div className="voice-controls">{voiceSession.current ? <button className="secondary" disabled={busy} onClick={() => void stopVoice()}>End voice session</button> : <button className="start-button" disabled={busy} onClick={() => void startVoice()}>◉ Start voice conversation</button>}</div>
+        <div className="voice-controls"><label>Conversation language<select value={voiceProfileId} disabled={busy || Boolean(voiceSession.current) || !voiceConfig} onChange={event => setVoiceProfileId(event.target.value)}>{voiceConfig?.profiles.map(profile => <option key={profile.id} value={profile.id}>{profile.label}</option>)}</select></label>{voiceSession.current ? <button className="secondary" disabled={busy} onClick={() => void stopVoice()}>End voice session</button> : <button className="start-button" disabled={busy || !voiceConfig} onClick={() => void startVoice()}>◉ Start voice conversation</button>}</div>
+        {diagnosticId && <details className="voice-diagnostics"><summary>Voice session diagnostics</summary><p>Session: <code>{diagnosticId}</code></p><p>Provider status: {diagnostics?.session.status ?? "Checking?"}. Updates every 10 seconds.</p><p>Audio events indicate playback was requested, not that speech was heard. Client events are self reported.</p>{diagnosticError && <p role="status">{diagnosticError}</p>}<ol>{diagnostics?.events.map((event, i) => <li key={i}><time>{new Date(event.created_at).toLocaleTimeString()}</time> {event.event.replaceAll("_", " ")}</li>)}</ol><p>Credentials and conversation text are excluded from diagnostics.</p></details>}
         {transcripts.length > 0 && <div className="transcript" aria-live="polite">{transcripts.map((item, index) => <p key={`${index}-${item.role}`}><b>{item.role === "assistant" ? "Guardian" : "You"}:</b> {item.content}</p>)}</div>}
-        <p className="voice-caption">Voice sessions use Agora RTC and the configured Murf Falcon agent.</p>
+        <p className="voice-caption">Voice sessions use Agora RTC and Murf Falcon. Auto-detect recognizes multilingual input but replies with the configured default voice; choose a language profile for matching speech output.</p>
         <form onSubmit={startIncident}><textarea required minLength={10} maxLength={2000} value={summary} onChange={e => setSummary(e.target.value)} placeholder="Example: Someone claiming to be a police officer threatened me and asked me to transfer ₹35,000. I may have shared banking details." /><button className="start-button" disabled={busy || summary.trim().length < 10}>{busy ? "Working…" : "Review my situation →"}</button></form>
         <small>No PINs or OTPs. Banking actions here are synthetic sandbox actions only.</small></div><div className="voice-art" aria-hidden="true"><div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="guardian-seal">G</div><div className="wave"><b/><b/><b/><b/><b/><b/><b/><b/><b/><b/><b/></div></div></section>
 

@@ -1,0 +1,55 @@
+services:
+  - type: web
+    name: guardian-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: DEMO_API_TOKEN
+        sync: false
+      - key: AGORA_APP_ID
+        sync: false
+      - key: AGORA_APP_CERTIFICATE
+        sync: false
+      - key: AGORA_CUSTOMER_ID
+        sync: false
+      - key: AGORA_CUSTOMER_SECRET
+        sync: false
+      - key: MURF_API_KEY
+        sync: false
+      - key: VERCEL_AI_GATEWAY_API_KEY
+        sync: false
+      - key: VERCEL_AI_GATEWAY_MODEL
+        value: openai/gpt-4.1-mini
+      - key: GUARDIAN_PUBLIC_API_URL
+        sync: false
+      - key: GUARDIAN_FRONTEND_ORIGINS
+        sync: false
+      - key: MURF_VOICE_ID
+        value: hi-IN-rachna
+      - key: MURF_LOCALE
+        value: hi-IN
+      - key: GUARDIAN_ASR_LANGUAGE
+        value: hi
+      - key: GUARDIAN_DEFAULT_LANGUAGE_LABEL
+        value: Hindi
+      - key: GUARDIAN_DEFAULT_REPLY_LANGUAGE
+        value: Hindi
+      - key: GUARDIAN_DEFAULT_VOICE_PROFILE
+        value: default
+  - type: web
+    name: guardian-dashboard
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: ./dist
+    envVars:
+      - key: NODE_VERSION
+        value: 22.16.0
+      - key: VITE_API_URL
+        sync: false

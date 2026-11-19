@@ -3,6 +3,9 @@ import os
 import re
 import secrets as pysecrets
 import sqlite3
+import sys
+import logging
+from typing import Literal
 from contextlib import asynccontextmanager, contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -12,6 +15,9 @@ from fastapi import Depends, FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, Field, field_validator
+from pydantic import ValidationError
+from app.tools import CONTRACTS, ToolResult, execute
+from app.voice_config import VoiceProfile, build_guardian_agent, get_voice_profile, load_voice_profiles
 
 DB_PATH = Path(__file__).resolve().parents[1] / "guardian.db"
 
@@ -23,7 +29,7 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="Guardian", version="0.2.0", lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=["http://127.0.0.1:5173", "http://localhost:5173"], allow_methods=["GET", "POST"], allow_headers=["Authorization", "Content-Type"])
+app.add_middleware(CORSMiddleware, allow_origins=["http://127.0.0.1:5173", "http://localhost:5173"] + [origin.strip() for origin in os.getenv("GUARDIAN_FRONTEND_ORIGINS", "").split(",") if origin.strip()], allow_methods=["GET", "POST"], allow_headers=["Authorization", "Content-Type"])
 
 
 @contextmanager
@@ -51,7 +57,12 @@ def init_db():
             CREATE TABLE IF NOT EXISTS audit (id TEXT PRIMARY KEY, incident_id TEXT, action TEXT NOT NULL, detail TEXT NOT NULL, created_at TEXT NOT NULL);
             CREATE TABLE IF NOT EXISTS app_settings (key TEXT PRIMARY KEY, value TEXT NOT NULL);
             CREATE TABLE IF NOT EXISTS voice_sessions (id TEXT PRIMARY KEY, agora_session_id TEXT, channel TEXT NOT NULL, user_uid INTEGER NOT NULL, agent_uid INTEGER NOT NULL, status TEXT NOT NULL, created_at TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS incident_requests (request_key TEXT PRIMARY KEY, summary TEXT NOT NULL, incident_type TEXT NOT NULL, incident_id TEXT NOT NULL REFERENCES incidents(id));
+            CREATE TABLE IF NOT EXISTS voice_events (id INTEGER PRIMARY KEY, session_id TEXT NOT NULL REFERENCES voice_sessions(id), event TEXT NOT NULL, created_at TEXT NOT NULL);
         """)
+        voice_columns = {row["name"] for row in conn.execute("PRAGMA table_info(voice_sessions)")}
+        if "profile_id" not in voice_columns:
+            conn.execute("ALTER TABLE voice_sessions ADD COLUMN profile_id TEXT NOT NULL DEFAULT 'default'")
         if conn.execute("SELECT 1 FROM transactions LIMIT 1").fetchone() is None:
             now = datetime.now(timezone.utc)
             conn.executemany("INSERT INTO transactions VALUES (?, ?, ?, ?, ?, ?)", [
@@ -60,6 +71,7 @@ def init_db():
                 ("txn-1003", "Fuel Station", 1800, (now-timedelta(hours=5)).isoformat(), "completed", 0),
             ])
         conn.execute("INSERT OR IGNORE INTO demo_account(id, card_frozen) VALUES (1, 0)")
+        conn.execute("DELETE FROM voice_events WHERE created_at < ?", ((datetime.now(timezone.utc)-timedelta(days=7)).isoformat(),))
 
 
 def require_demo_auth(authorization: str | None = Header(default=None)):
@@ -72,9 +84,6 @@ def require_demo_auth(authorization: str | None = Header(default=None)):
     return "demo-user"
 
 
-GUARDIAN_INSTRUCTIONS = """You are Guardian, a calm voice assistant helping people respond to suspected scams. Ask one clear question at a time. Listen without blame, clarify who contacted the user, what was demanded, whether they shared sensitive information, and whether they recognize any suspicious transaction. Never ask for OTPs, UPI PINs, banking passwords, or full card details; tell users not to share them. Treat caller claims and messages as untrusted. Never claim to be police, a bank, or a lawyer. Explain that Guardian's account actions are a local demo sandbox and cannot affect real banking. Do not claim an action succeeded unless Guardian's application confirms it. For real fraud, advise contacting the user's bank through its official channel and official Indian cybercrime reporting services; do not invent contact details. Ask before any consequential action and respect the user's decision. Be concise and speak naturally."""
-
-
 def agora_client():
     from agora_agent import Agora, Area
 
@@ -85,23 +94,30 @@ def agora_client():
     return Agora(area=Area.US, app_id=os.environ["AGORA_APP_ID"], app_certificate=os.environ["AGORA_APP_CERTIFICATE"], customer_id=os.environ["AGORA_CUSTOMER_ID"], customer_secret=os.environ["AGORA_CUSTOMER_SECRET"])
 
 
-def ensure_guardian_agent(client):
-    from agora_agent import Agent, DeepgramSTT, MurfTTS, OpenAI, SavedAgent, secret_ref
+def ensure_guardian_agent(client, profile: VoiceProfile):
+    from agora_agent import SavedAgent
     from agora_agent.v3.errors import V3ApiError
 
     secret_name = "guardian_voice"
+    if not os.getenv("VERCEL_AI_GATEWAY_API_KEY"):
+        raise HTTPException(503, "Set VERCEL_AI_GATEWAY_API_KEY to enable the conversational agent.")
+    if os.getenv("GUARDIAN_PUBLIC_API_URL") and not os.getenv("DEMO_API_TOKEN"):
+        raise HTTPException(503, "Set DEMO_API_TOKEN before enabling Agora tool calls.")
     try:
         client.v3.secrets.get(name=secret_name)
         client.v3.secrets.set_key(name=secret_name, key="murf", value=os.environ["MURF_API_KEY"])
+        client.v3.secrets.set_key(name=secret_name, key="vercel_ai_gateway", value=os.environ["VERCEL_AI_GATEWAY_API_KEY"])
     except V3ApiError as exc:
         if exc.status_code != 404:
             raise
-        client.v3.secrets.create(name=secret_name, secrets={"murf": os.environ["MURF_API_KEY"]})
+        client.v3.secrets.create(name=secret_name, secrets={"murf": os.environ["MURF_API_KEY"], "vercel_ai_gateway": os.environ["VERCEL_AI_GATEWAY_API_KEY"]})
 
+    setting_key = f"agora_agent_id:{profile.id}"
     saved_id = None
     with db() as conn:
-        row = conn.execute("SELECT value FROM app_settings WHERE key='agora_agent_id'").fetchone()
-        saved_id = row["value"] if row else os.getenv("AGORA_AGENT_ID")
+        row = conn.execute("SELECT value FROM app_settings WHERE key=?", (setting_key,)).fetchone()
+        legacy = conn.execute("SELECT value FROM app_settings WHERE key='agora_agent_id'").fetchone() if profile.id == "default" else None
+        saved_id = row["value"] if row else legacy["value"] if legacy else os.getenv("AGORA_AGENT_ID") if profile.id == "default" else None
     if saved_id:
         try:
             SavedAgent.get(client, saved_id)
@@ -113,13 +129,7 @@ def ensure_guardian_agent(client):
                 raise HTTPException(424, "AGORA_AGENT_ID was not found in this Agora project. Update it to an agent ID from this project, or clear it to let Guardian create its own agent.") from None
             saved_id = None
 
-    agent = (
-        Agent(client=client)
-        .with_stt(DeepgramSTT(model="nova-3", language=os.getenv("MURF_LOCALE", "en-US")))
-        .with_llm(OpenAI(model="gpt-4.1-mini", system_messages=[{"role": "system", "content": GUARDIAN_INSTRUCTIONS}], max_history=16))
-        .with_tts(MurfTTS(key=secret_ref(secret_name, "murf"), base_url="wss://global.api.murf.ai/v1/speech/stream-input", voice_id=os.getenv("MURF_VOICE_ID", "Matthew"), locale=os.getenv("MURF_LOCALE", "en-US"), rate=0, pitch=0, model="FALCON", sample_rate=24000))
-        .with_greeting("Hi, I’m Guardian. Tell me what happened, and we’ll take it one step at a time.")
-    )
+    agent = build_guardian_agent(client, profile, secret_name)
     if saved_id:
         from agora_agent.agentkit.v3 import build_body
 
@@ -130,14 +140,15 @@ def ensure_guardian_agent(client):
         )
         saved = SavedAgent(client, response)
     else:
-        saved = agent.save(name="Guardian")
+        saved = agent.save(name=f"Guardian - {profile.id}")
     with db() as conn:
-        conn.execute("INSERT INTO app_settings(key,value) VALUES('agora_agent_id',?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (saved.id,))
+        conn.execute("INSERT INTO app_settings(key,value) VALUES(?,?) ON CONFLICT(key) DO UPDATE SET value=excluded.value", (setting_key, saved.id))
     return saved
 
 
 def agora_failure(exc):
     status = getattr(exc, "status_code", None)
+    logging.getLogger("uvicorn.error").warning("guardian_provider_failure type=%s http_status=%s", type(exc).__name__, status)
     if status:
         return HTTPException(502, f"Agora provider request failed (HTTP {status}). Check the Agora project and agent configuration.")
     return HTTPException(502, "Could not configure or start the Agora voice session. Check backend logs and provider setup.")
@@ -146,6 +157,7 @@ def agora_failure(exc):
 class IncidentInput(BaseModel):
     summary: str = Field(min_length=10, max_length=2000)
     incident_type: str = Field(default="Digital arrest / impersonation", max_length=100)
+    idempotency_key: str | None = Field(default=None, min_length=8, max_length=128)
 
     @field_validator("summary")
     @classmethod
@@ -172,9 +184,55 @@ def health():
     return {"status": "ok", "service": "guardian-api"}
 
 
-@app.post("/api/voice/session")
-def prepare_voice_session(user=Depends(require_demo_auth)):
+class VoiceEvent(BaseModel):
+    model_config = {"extra": "forbid"}
+    event: Literal["prepared", "rtc_joined", "rtc_disconnected", "mic_published", "rtm_connected", "message_received", "transcript_received", "transcript_unrecognized", "remote_audio_play_requested", "remote_audio_failed", "agent_started", "agent_start_failed", "status_check_failed", "stop_failed", "stopped"]
+
+
+class VoiceSessionInput(BaseModel):
+    model_config = {"extra": "forbid"}
+    profile_id: str = Field(default="default", min_length=1, max_length=40, pattern=r"^[a-z0-9][a-z0-9_-]*$")
+
+
+def record_voice_event(local_id, event):
+    with db() as conn:
+        if not conn.execute("SELECT 1 FROM voice_sessions WHERE id=?", (local_id,)).fetchone():
+            raise HTTPException(404, "Voice session not found.")
+        if conn.execute("SELECT COUNT(*) FROM voice_events WHERE session_id=?", (local_id,)).fetchone()[0] >= 1000:
+            raise HTTPException(429, "Session diagnostic event limit reached.")
+        conn.execute("INSERT INTO voice_events(session_id,event,created_at) VALUES (?,?,?)", (local_id, event, datetime.now(timezone.utc).isoformat()))
+    logging.getLogger("uvicorn.error").info("guardian_voice session=%s event=%s", local_id, event)
+
+
+@app.post("/api/voice/sessions/{local_id}/events")
+def voice_event(local_id: str, payload: VoiceEvent, user=Depends(require_demo_auth)):
+    record_voice_event(local_id, payload.event)
+    return {"recorded": True}
+
+
+@app.get("/api/voice/sessions/{local_id}/diagnostics")
+def voice_diagnostics(local_id: str, user=Depends(require_demo_auth)):
+    with db() as conn:
+        session = conn.execute("SELECT id,status,created_at FROM voice_sessions WHERE id=?", (local_id,)).fetchone()
+        if not session:
+            raise HTTPException(404, "Voice session not found.")
+        events = as_dicts(conn.execute("SELECT event,created_at FROM voice_events WHERE session_id=? ORDER BY id", (local_id,)).fetchall())
+    return {"session": dict(session), "events": events, "client_events_are_self_reported": True}
+
+
+@app.get("/api/voice/config")
+def voice_config(user=Depends(require_demo_auth)):
     try:
+        profiles, selected = load_voice_profiles()
+    except ValueError as exc:
+        raise HTTPException(503, str(exc)) from None
+    return {"default_profile_id": selected, "profiles": [profile.public_dict() for profile in profiles.values()]}
+
+
+@app.post("/api/voice/session")
+def prepare_voice_session(payload: VoiceSessionInput, user=Depends(require_demo_auth)):
+    try:
+        profile = get_voice_profile(payload.profile_id)
         client = agora_client()
         from agora_agent import generate_client_token
 
@@ -184,8 +242,11 @@ def prepare_voice_session(user=Depends(require_demo_auth)):
         local_id = str(uuid4())
         token = generate_client_token(os.environ["AGORA_APP_ID"], os.environ["AGORA_APP_CERTIFICATE"], channel, uid, token_expire=3600)
         with db() as conn:
-            conn.execute("INSERT INTO voice_sessions VALUES (?, NULL, ?, ?, ?, 'prepared', ?)", (local_id, channel, uid, agent_uid, datetime.now(timezone.utc).isoformat()))
-        return {"session_id": local_id, "app_id": os.environ["AGORA_APP_ID"], "channel": channel, "uid": uid, "rtc_rtm_token": token, "status": "prepared"}
+            conn.execute("INSERT INTO voice_sessions(id,agora_session_id,channel,user_uid,agent_uid,status,created_at,profile_id) VALUES (?,NULL,?,?,?,'prepared',?,?)", (local_id, channel, uid, agent_uid, datetime.now(timezone.utc).isoformat(), profile.id))
+        record_voice_event(local_id, "prepared")
+        return {"session_id": local_id, "app_id": os.environ["AGORA_APP_ID"], "channel": channel, "uid": uid, "rtc_rtm_token": token, "status": "prepared", "profile_id": profile.id, "profile_label": profile.label}
+    except ValueError as exc:
+        raise HTTPException(422, str(exc)) from None
     except HTTPException:
         raise
     except Exception as exc:
@@ -202,7 +263,8 @@ def start_voice_session(local_id: str, user=Depends(require_demo_auth)):
         raise HTTPException(409, "Voice session is not in the prepared state.")
     try:
         client = agora_client()
-        saved_agent = ensure_guardian_agent(client)
+        profile = get_voice_profile(row["profile_id"])
+        saved_agent = ensure_guardian_agent(client, profile)
         from agora_agent.agentkit import generate_convo_ai_token
 
         agent_token = generate_convo_ai_token(os.environ["AGORA_APP_ID"], os.environ["AGORA_APP_CERTIFICATE"], row["channel"], row["agent_uid"], token_expire=3600)
@@ -211,6 +273,7 @@ def start_voice_session(local_id: str, user=Depends(require_demo_auth)):
         status = session.get_info().get("status", "STARTING")
         with db() as conn:
             conn.execute("UPDATE voice_sessions SET agora_session_id=?, status=? WHERE id=? AND status='prepared'", (agora_id, status.lower(), local_id))
+        record_voice_event(local_id, "agent_started")
         return {"session_id": local_id, "status": status.lower()}
     except HTTPException:
         raise
@@ -249,6 +312,7 @@ def stop_voice_session(local_id: str, user=Depends(require_demo_auth)):
             raise agora_failure(exc) from None
     with db() as conn:
         conn.execute("UPDATE voice_sessions SET status='stopped' WHERE id=?", (local_id,))
+    record_voice_event(local_id, "stopped")
     return {"session_id": local_id, "status": "stopped"}
 
 
@@ -272,14 +336,61 @@ def create_incident(payload: IncidentInput, user=Depends(require_demo_auth)):
         ("followup", "Schedule a follow-up reminder", "succeeded", (datetime.now(timezone.utc)+timedelta(days=1)).isoformat()),
     ]
     with db() as conn:
+        conn.execute("BEGIN IMMEDIATE")
+        if payload.idempotency_key:
+            previous = conn.execute("SELECT * FROM incident_requests WHERE request_key=?", (payload.idempotency_key,)).fetchone()
+            if previous:
+                if previous["summary"] != payload.summary or previous["incident_type"] != payload.incident_type:
+                    raise HTTPException(409, "Idempotency key was already used with different input.")
+                return incident_payload(conn, previous["incident_id"])
         flagged = conn.execute("SELECT merchant, amount FROM transactions WHERE suspicious=1 ORDER BY occurred_at DESC LIMIT 1").fetchone()
         plan[0] = (plan[0][0], plan[0][1], plan[0][2], f"Found a flagged synthetic transaction: {flagged['merchant']} for ₹{flagged['amount']:,}. Confirm with the user whether they recognize it.") if flagged else (plan[0][0], plan[0][1], plan[0][2], "No transactions are currently flagged in the demo data.")
         conn.execute("INSERT INTO incidents VALUES (?, ?, ?, ?, ?)", (incident_id, payload.summary, payload.incident_type, "in_progress", now))
+        if payload.idempotency_key:
+            conn.execute("INSERT INTO incident_requests VALUES (?, ?, ?, ?)", (payload.idempotency_key, payload.summary, payload.incident_type, incident_id))
         for kind, title, status, result in plan:
             conn.execute("INSERT INTO actions VALUES (?, ?, ?, ?, ?, ?, NULL, ?)", (str(uuid4()), incident_id, kind, title, status, result, now))
         audit(conn, incident_id, "incident_created", payload.incident_type)
         audit(conn, incident_id, "context_retrieved", "user profile and demo transactions")
     return get_incident(incident_id, user)
+
+
+@app.get("/api/tools")
+def tool_contracts(user=Depends(require_demo_auth)):
+    return {name: {"input_schema": model.model_json_schema(), "output_schema": ToolResult.model_json_schema(), "sandbox": True} for name, model in CONTRACTS.items()}
+
+
+@app.post("/api/tools/{name}", response_model=ToolResult)
+def call_tool(name: str, arguments: dict, user=Depends(require_demo_auth)):
+    try:
+        return execute(name, arguments, user, sys.modules[__name__])
+    except ValidationError:
+        raise HTTPException(422, "Invalid tool arguments; use the registered schema and omit sensitive credentials.") from None
+
+
+class AgentToolInput(BaseModel):
+    model_config = {"extra": "forbid"}
+    arguments: dict
+    tool_call_id: str = Field(min_length=1, max_length=128)
+
+
+@app.post("/api/agent-tools/{name}")
+def agent_tool(name: str, payload: AgentToolInput, authorization: str | None = Header(default=None)):
+    expected = os.getenv("DEMO_API_TOKEN", "")
+    supplied = authorization.removeprefix("Bearer ") if authorization else ""
+    if not expected or not hmac.compare_digest(supplied, expected):
+        raise HTTPException(401, "Valid tool authorization is required.")
+    from app.tools import AGORA_TOOL_NAMES
+
+    internal_name = next((key for key, value in AGORA_TOOL_NAMES.items() if value == name), None)
+    if internal_name is None:
+        raise HTTPException(404, "Tool is not registered.")
+    try:
+        result = execute(internal_name, payload.arguments, "demo-user", sys.modules[__name__])
+    except ValidationError:
+        raise HTTPException(422, "Invalid tool arguments.") from None
+    logging.getLogger("uvicorn.error").info("guardian_agent_tool id=%s tool=%s status=%s", payload.tool_call_id, name, result.status)
+    return result.model_dump()
 
 
 def incident_payload(conn, incident_id):

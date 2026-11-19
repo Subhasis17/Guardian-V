@@ -148,7 +148,13 @@ def ensure_guardian_agent(client, profile: VoiceProfile):
 
 def agora_failure(exc):
     status = getattr(exc, "status_code", None)
-    logging.getLogger("uvicorn.error").warning("guardian_provider_failure type=%s http_status=%s", type(exc).__name__, status)
+    detail = getattr(exc, "detail", None)
+    if detail:
+        for name in ("DEMO_API_TOKEN", "AGORA_APP_CERTIFICATE", "AGORA_CUSTOMER_SECRET", "MURF_API_KEY", "VERCEL_AI_GATEWAY_API_KEY"):
+            secret = os.getenv(name)
+            if secret:
+                detail = detail.replace(secret, "[redacted]")
+    logging.getLogger("uvicorn.error").warning("guardian_provider_failure type=%s http_status=%s reason=%s request_id=%s detail=%s", type(exc).__name__, status, getattr(exc, "reason", None), getattr(exc, "request_id", None), detail[:500] if detail else None)
     if status:
         return HTTPException(502, f"Agora provider request failed (HTTP {status}). Check the Agora project and agent configuration.")
     return HTTPException(502, "Could not configure or start the Agora voice session. Check backend logs and provider setup.")

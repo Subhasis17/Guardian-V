@@ -97,7 +97,7 @@ def get_voice_profile(profile_id: str):
 
 def build_guardian_agent(client, profile: VoiceProfile, secret_name: str):
     """Build the Agora agent with separately configurable ASR and Murf Falcon output."""
-    from agora_agent import Agent, CustomLLM, DeepgramSTT, MurfTTS, secret_ref
+    from agora_agent import Agent, DeepgramSTT, MurfTTS, OpenAI, secret_ref
 
     language_instruction = (
         "The speech recognizer auto-detects multilingual input, but the Murf reply voice is fixed for this session."
@@ -105,9 +105,7 @@ def build_guardian_agent(client, profile: VoiceProfile, secret_name: str):
         else f"The user selected the {profile.label} voice profile."
     )
     llm_options = {
-        "model": os.getenv("VERCEL_AI_GATEWAY_MODEL", "openai/gpt-4.1-mini"),
-        "api_key": secret_ref(secret_name, "vercel_ai_gateway"),
-        "base_url": "https://ai-gateway.vercel.sh/v1/chat/completions",
+        "model": "gpt-4o-mini",
         "system_messages": [{"role": "system", "content": f"{GUARDIAN_INSTRUCTIONS}\n\nReply in {profile.reply_language}. {language_instruction} Use tools for context and incident workflows. Never claim a sensitive action succeeded while its result is awaiting approval."}],
         "max_history": 16,
     }
@@ -120,7 +118,7 @@ def build_guardian_agent(client, profile: VoiceProfile, secret_name: str):
     agent = (
         Agent(client=client)
         .with_stt(DeepgramSTT(model="nova-3", language=profile.asr_language))
-        .with_llm(CustomLLM(**llm_options))
+        .with_llm(OpenAI(**llm_options))
         .with_tts(MurfTTS(
             key=secret_ref(secret_name, "murf"),
             base_url="wss://global.api.murf.ai/v1/speech/stream-input",

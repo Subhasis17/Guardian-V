@@ -99,18 +99,14 @@ def ensure_guardian_agent(client, profile: VoiceProfile):
     from agora_agent.v3.errors import V3ApiError
 
     secret_name = "guardian_voice"
-    if not os.getenv("VERCEL_AI_GATEWAY_API_KEY"):
-        raise HTTPException(503, "Set VERCEL_AI_GATEWAY_API_KEY to enable the conversational agent.")
     if os.getenv("GUARDIAN_PUBLIC_API_URL") and not os.getenv("DEMO_API_TOKEN"):
         raise HTTPException(503, "Set DEMO_API_TOKEN before enabling Agora tool calls.")
     try:
         client.v3.secrets.get(name=secret_name)
         client.v3.secrets.set_key(name=secret_name, key="murf", value=os.environ["MURF_API_KEY"])
-        client.v3.secrets.set_key(name=secret_name, key="vercel_ai_gateway", value=os.environ["VERCEL_AI_GATEWAY_API_KEY"])
     except V3ApiError as exc:
         if exc.status_code != 404:
             raise
-        client.v3.secrets.create(name=secret_name, secrets={"murf": os.environ["MURF_API_KEY"], "vercel_ai_gateway": os.environ["VERCEL_AI_GATEWAY_API_KEY"]})
 
     setting_key = f"agora_agent_id:{profile.id}"
     saved_id = None
@@ -150,7 +146,7 @@ def agora_failure(exc):
     status = getattr(exc, "status_code", None)
     detail = getattr(exc, "detail", None)
     if detail:
-        for name in ("DEMO_API_TOKEN", "AGORA_APP_CERTIFICATE", "AGORA_CUSTOMER_SECRET", "MURF_API_KEY", "VERCEL_AI_GATEWAY_API_KEY"):
+        for name in ("DEMO_API_TOKEN", "AGORA_APP_CERTIFICATE", "AGORA_CUSTOMER_SECRET", "MURF_API_KEY"):
             secret = os.getenv(name)
             if secret:
                 detail = detail.replace(secret, "[redacted]")

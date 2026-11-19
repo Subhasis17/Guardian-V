@@ -107,7 +107,7 @@ def build_guardian_agent(client, profile: VoiceProfile, secret_name: str):
     llm_options = {
         "model": os.getenv("VERCEL_AI_GATEWAY_MODEL", "openai/gpt-4.1-mini"),
         "api_key": secret_ref(secret_name, "vercel_ai_gateway"),
-        "base_url": "https://ai-gateway.vercel.sh/v1",
+        "base_url": "https://ai-gateway.vercel.sh/v1/chat/completions",
         "system_messages": [{"role": "system", "content": f"{GUARDIAN_INSTRUCTIONS}\n\nReply in {profile.reply_language}. {language_instruction} Use tools for context and incident workflows. Never claim a sensitive action succeeded while its result is awaiting approval."}],
         "max_history": 16,
     }

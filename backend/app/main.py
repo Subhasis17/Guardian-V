@@ -261,12 +261,16 @@ def start_voice_session(local_id: str, user=Depends(require_demo_auth)):
         raise HTTPException(404, "Voice session not found.")
     if row["status"] != "prepared":
         raise HTTPException(409, "Voice session is not in the prepared state.")
+    stage = "agora_client"
     try:
         client = agora_client()
+        stage = "voice_profile"
         profile = get_voice_profile(row["profile_id"])
+        stage = "agent_configuration"
         saved_agent = ensure_guardian_agent(client, profile)
         from agora_agent.agentkit import generate_convo_ai_token
 
+        stage = "session_start"
         agent_token = generate_convo_ai_token(os.environ["AGORA_APP_ID"], os.environ["AGORA_APP_CERTIFICATE"], row["channel"], row["agent_uid"], token_expire=3600)
         session = saved_agent.create_session(channel=row["channel"], token=agent_token, agent_uid=str(row["agent_uid"]), remote_uids=[str(row["user_uid"])], idempotency_key=local_id, idle_timeout=60, max_duration=3600, data_policy={"retention": "none"})
         agora_id = session.start()
@@ -278,6 +282,7 @@ def start_voice_session(local_id: str, user=Depends(require_demo_auth)):
     except HTTPException:
         raise
     except Exception as exc:
+        logging.getLogger("uvicorn.error").warning("guardian_voice_start_failed session=%s stage=%s", local_id, stage)
         raise agora_failure(exc) from None
 
 

@@ -1,3 +1,4 @@
+from app.privacy import username_key
 from fastapi.testclient import TestClient
 from app import main, database
 
@@ -7,7 +8,7 @@ def test_registration_isolates_users_and_tools(tmp_path, monkeypatch):
     main._requests.clear()
     with TestClient(main.app) as alice, TestClient(main.app) as bob:
         for client, name in ((alice, "alice"), (bob, "bob")):
-            data = {"username": name, "password": "long-password-for-test"}
+            data = {"username": name, "password": "long-password-for-test", "age": 30, "address": "Synthetic test address", "consent": True, "consent_version": "2026-11-21-v1"}
             assert client.post("/api/auth/register", json=data).status_code == 201
             assert client.post("/api/auth/register", json=data).status_code == 409
             response = client.post("/api/auth/login", json=data)
@@ -24,7 +25,7 @@ def test_registration_isolates_users_and_tools(tmp_path, monkeypatch):
         assert alice.get("/api/context").json()["account"]["card_frozen"] is True
         assert bob.get("/api/context").json()["account"]["card_frozen"] is False
         with database.db() as conn:
-            bob_token = conn.execute("SELECT tool_token FROM users WHERE username='bob'").fetchone()[0]
+            bob_token = conn.execute("SELECT tool_token FROM users WHERE username=?", ( username_key("bob"),)).fetchone()[0]
         result = bob.post("/api/agent-tools/generateReport", headers={"Authorization": "Bearer " + bob_token}, json={"arguments": {"incident_id": iid}, "tool_call_id": "cross-user"})
         assert result.status_code == 404
         assert bob.get("/api/voice/sessions/another-users-session/diagnostics").status_code == 404

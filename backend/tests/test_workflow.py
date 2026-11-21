@@ -428,7 +428,7 @@ def test_voice_profiles_are_dynamic_and_do_not_expose_murf_voice_id(
         ids = [profile["id"] for profile in config["profiles"]]
         assert ids[:2] == ["default", "auto"]
         assert "hindi" in ids
-        assert len(ids) > 132
+        assert 30 < len(ids) < 132
         assert len(ids) == len(set(ids))
         assert config["profiles"][0]["reply_language"] == "English"
         auto = next(

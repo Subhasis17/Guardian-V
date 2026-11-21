@@ -1,3 +1,4 @@
+import { AuthPages } from "./components/AuthPages";
 import { PendingApprovals } from "./components/PendingApprovals";
 import { useVoice } from "./hooks/useVoice";
 import { useEffect, useRef, useState, type FormEvent } from "react";
@@ -10,9 +11,6 @@ const API = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8000").replace(
 
 export default function App() {
   const [token, setToken] = useState("");
-  const [tokenInput, setTokenInput] = useState("");
-  const [username, setUsername] = useState("");
-  const [registering, setRegistering] = useState(false);
   const [google, setGoogle] = useState<{connected: boolean; trusted_contact_email: string} | null>(null);
   const [contactEmail, setContactEmail] = useState("");
   const [context, setContext] = useState<Context | null>(null);
@@ -28,6 +26,10 @@ export default function App() {
     path: string,
     options: RequestInit = {},
   ): Promise<T> {
+    const destination = new URL(API, window.location.origin);
+    if (destination.protocol !== 'https:' && !['localhost', '127.0.0.1', '[::1]'].includes(destination.hostname)) {
+      throw new Error('Guardian requires an HTTPS API connection to protect your information.');
+    }
     const response = await fetch(`${API}${path}`, {
       ...options,
       credentials: "include",
@@ -101,16 +103,6 @@ export default function App() {
     const timer = window.setInterval(() => void loadContext(), 5000);
     return () => window.clearInterval(timer);
   }, [token]);
-
-  async function connect() {
-    try {
-      if (registering) {
-        await request("/api/auth/register", {method: "POST", body: JSON.stringify({username, password: tokenInput})});
-      }
-      const session = await request<{csrf_token: string}>("/api/auth/login", {method: "POST", body: JSON.stringify({username, password: tokenInput})});
-      setToken(session.csrf_token); setTokenInput(""); setError("");
-    } catch (e) { setError(e instanceof Error ? e.message : "Sign in failed."); }
-  }
 
   useEffect(() => {
     sessionStorage.removeItem("guardian-token");
@@ -233,36 +225,7 @@ export default function App() {
         <span className="date">INCIDENT RESPONSE</span>
       </section>
 
-      {!token && (
-        <section className="panel auth-panel">
-          <div>
-            <p className="eyebrow">LOCAL DEMO ACCESS</p>
-            <h2>{registering ? "Create your Guardian account" : "Sign in to Guardian"}</h2>
-            <p>
-              {registering ? "Choose a username and a password of at least 12 characters. Your incident history is private to your account." : "Sign in to access your conversations and incident history."}
-            </p>
-          </div>
-          <div className="auth-row">
-            <input aria-label="Username" autoComplete="username" value={username} onChange={e => setUsername(e.target.value)} placeholder="Username" />
-            <input
-              aria-label="Password"
-              autoComplete={registering ? "new-password" : "current-password"}
-              type="password"
-              value={tokenInput}
-              onChange={(e) => setTokenInput(e.target.value)}
-              placeholder="Password"
-            />
-            <button
-              className="primary"
-              onClick={() => void connect()}
-              disabled={!tokenInput.trim()}
-            >
-              {registering ? "Create account" : "Sign in"}
-            </button>
-          </div>
-          <button className="link-button" onClick={() => { setRegistering(!registering); setError(""); }}>{registering ? "Already registered? Sign in" : "New here? Create an account"}</button>
-        </section>
-      )}
+      {!token && <AuthPages request={request} onSignedIn={csrf => {setToken(csrf); setError("");}} />}
 
       {error && (
         <div className="error" role="alert">

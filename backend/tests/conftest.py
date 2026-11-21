@@ -21,6 +21,8 @@ def pytest_sessionfinish(session, exitstatus):
 
 @pytest.fixture(autouse=True)
 def sandbox_bank(tmp_path, monkeypatch):
+    from cryptography.fernet import Fernet
+    monkeypatch.setenv('GUARDIAN_PII_ENCRYPTION_KEY', Fernet.generate_key().decode())
     spec = importlib.util.spec_from_file_location("guardian_test_bank", Path(__file__).resolve().parents[2] / "mock-bank" / "main.py")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)

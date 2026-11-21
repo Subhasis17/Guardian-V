@@ -204,13 +204,14 @@ def voice_diagnostics(local_id: str, user=Depends(require_demo_auth)):
 
 
 def voice_config(user=Depends(require_demo_auth)):
+    from app.voice_config import dropdown_profiles
     try:
         profiles, selected = load_voice_profiles()
     except ValueError as exc:
         raise HTTPException(503, str(exc)) from None
     return {
         "default_profile_id": selected,
-        "profiles": [profile.public_dict() for profile in profiles.values()],
+        "profiles": [profile.public_dict() for profile in dropdown_profiles(profiles, selected)],
     }
 
 

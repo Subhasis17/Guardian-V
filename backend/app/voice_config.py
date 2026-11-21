@@ -114,6 +114,40 @@ def get_voice_profile(profile_id: str):
         raise ValueError(f"Unknown voice profile: {profile_id}") from None
 
 
+def dropdown_profiles(profiles, selected):
+    """Curate the picker without removing profiles used by saved sessions."""
+    catalog = json.loads(Path(__file__).with_name("murf_voices.json").read_text(encoding="utf-8"))
+    voices = {voice['voiceId']: voice for voice in catalog}
+    english = {'en-US-natalie', 'en-US-wayne', 'en-UK-sharon', 'en-UK-hugo', 'en-IN-isha', 'en-IN-samar'}
+    keep = {key for key in profiles if not key.startswith('murf-')}
+    keep.add(selected)
+    international = {}
+    for key, profile in profiles.items():
+        if not key.startswith('murf-'):
+            continue
+        locale = profile.tts_locale
+        if locale.startswith('en-'):
+            if profile.tts_voice_id in english and voices[profile.tts_voice_id]['locale'] == locale:
+                keep.add(key)
+        elif locale.endswith('-IN'):
+            if voices[profile.tts_voice_id]['locale'] == locale:
+                keep.add(key)
+        else:
+            voice = voices[profile.tts_voice_id]
+            gender = re.search(r'\(([MF])\)$', voice['displayName'])
+            if gender:
+                group = (locale.split('-')[0], gender[1])
+                # Prefer a voice's native locale over a multilingual variant.
+                rank = (voice['locale'] != locale, profile.label)
+                if group not in international or rank < international[group][0]:
+                    international[group] = (rank, key)
+    keep.update(key for _, key in international.values())
+    default = profiles['default']
+    return [profile for key, profile in profiles.items() if key in keep and (
+        not key.startswith('murf-') or key == selected or
+        (profile.tts_voice_id, profile.tts_locale) != (default.tts_voice_id, default.tts_locale))]
+
+
 def build_guardian_agent(client, profile: VoiceProfile, secret_name: str):
     """Build the Agora agent with separately configurable ASR and Murf Falcon output."""
     from agora_agent import Agent, DeepgramSTT, MurfTTS, OpenAI, secret_ref

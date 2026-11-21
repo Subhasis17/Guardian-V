@@ -8,6 +8,7 @@ from collections import defaultdict, deque
 from threading import Lock
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from app.database import init_db
@@ -21,6 +22,11 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="Guardian", version="0.2.0", lifespan=lifespan)
+
+
+@app.exception_handler(RequestValidationError)
+async def safe_validation_error(request, exc):
+    return JSONResponse(status_code=422, content={"detail": "Invalid input. Check the required fields and allowed values."})
 _requests = defaultdict(deque)
 _rate_lock = Lock()
 

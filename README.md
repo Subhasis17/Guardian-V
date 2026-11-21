@@ -1,11 +1,18 @@
 # Guardian
 
-Voice defaults to English (Murf Natalie). The voice selector includes all 132
-Falcon voices and their listed locale variants from Murf's authenticated catalog
-retrieved on 2026-11-21, stored in backend/app/murf_voices.json. Select before
-starting a session. Non-English/Hindi profiles use multilingual ASR; Murf output
-locale availability does not guarantee speech recognition coverage for every
-language. The greeting is English. Individual voices still need live verification.
+Hackathon materials: [submission details](docs/hackathon-submission.md) and
+[PowerPoint presentation](docs/submission/Guardian-Hackathon.pptx).
+
+Voice defaults to English (Murf Natalie). The dropdown has six English choices
+(US, UK and Indian male/female voices), all native voices for the available
+Indian languages, and one male/female choice per other language wherever the
+catalog supports both. Current Indian languages: Bangla, Gujarati, Hindi,
+Kannada, Malayalam, Marathi, Punjabi and Tamil. Greek, Croatian, Polish, Slovak
+and Thai have only one listed gender in the saved catalog. Auto-detect and
+explicit custom profiles remain available. Saved sessions can still resolve
+profiles that are hidden from the picker. The catalog was retrieved on
+2026-11-21; output support does not guarantee ASR coverage. Live voice
+verification remains necessary.
 
 Local sandbox bank: start `mock-bank/main.py` on port 8001 before Guardian.
 See [mock bank setup](mock-bank/README.md) for commands and configuration.
@@ -147,3 +154,30 @@ For a single-instance deployment with a mounted persistent disk, set `GUARDIAN_D
 ### Separate bank on Render
 
 The Blueprint includes a free authenticated mock-bank web service and shares its generated service secret with Guardian. Set the API service `MOCK_BANK_URL` to the bank service?s actual HTTPS URL (no trailing path). Free services can sleep; bank unavailability is shown without hiding saved incidents or approvals. Both databases remain ephemeral until durable storage is provisioned. The bank endpoint is public and requires service authentication.
+
+## Registration and profile privacy
+
+New visitors start on Create an account. Existing users choose Sign in. An unsuccessful sign-in opens registration with a generic message and a link to retry login; the API does not expose a username-existence endpoint.
+
+Registration requires username, password, age (1?120), address, and explicit acceptance of the versioned privacy notice. Details stay in browser memory until Agree & create account. The server validates consent and records its version and UTC timestamp. Declining returns to the form without creating an account.
+
+Set `GUARDIAN_PII_ENCRYPTION_KEY` to a Fernet key before enabling registration (generated in the local .env during setup). Set a separate stable key in Render before releasing this version. Back it up securely outside the database. Losing or changing this key breaks protected username lookup and profile decryption; key rotation requires an explicit migration. No key is committed.
+
+New usernames are stored as keyed lookup digests. Age, address and the original username are stored together as authenticated encrypted ciphertext. Passwords retain salted scrypt hashing. The authenticated /api/auth/profile endpoint returns masked values only with no-store headers. Legacy registered usernames are converted to protected lookup values after a successful login when the key is configured; existing operator usernames retain their legacy storage. Existing accounts can log in without supplying new profile fields.
+
+The frontend refuses non-HTTPS remote APIs. Production registration requires HTTPS; plain HTTP is allowed only for local development (and the test host). TLS protects transport; masking is a display rule, not transport encryption. Browser autofill and the user's own browser can see values they enter. Validation responses omit submitted values; access logs omit bodies. Profile fields are not supplied to Agora, Google or the sandbox bank. Incident summaries, trusted-contact emails and provider data retain their existing storage and approval policies; this change does not encrypt every record across the application.
+
+Encrypted registration profiles and consent records remain for the lifetime of their account database. Self-service profile deletion and consent withdrawal after registration are not implemented; an operator must handle account deletion, including all account-specific files and the central registration record. This is a technical consent record, not a claim of legal compliance.
+
+### Separate Google OAuth configurations
+
+Local development uses GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET and
+GOOGLE_REDIRECT_URI=http://127.0.0.1:8000/api/integrations/google/callback.
+Deployment values are kept separately as GOOGLE_DEPLOY_CLIENT_ID,
+GOOGLE_DEPLOY_CLIENT_SECRET and GOOGLE_DEPLOY_REDIRECT_URI in the local .env.
+When configuring Render, copy those three deployment values into its runtime
+GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET and GOOGLE_REDIRECT_URI variables.
+The deployed callback is https://guardian-api-j55w.onrender.com/api/integrations/google/callback.
+Register it exactly under Authorized redirect URIs for the deployment Google
+OAuth client. The application does not automatically select the deployment
+variables during local startup.

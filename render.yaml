@@ -60,6 +60,8 @@ services:
         sync: false
       - key: GOOGLE_TOKEN_ENCRYPTION_KEY
         sync: false
+      - key: GUARDIAN_PII_ENCRYPTION_KEY
+        sync: false
       - key: MURF_VOICE_ID
         value: en-US-natalie
       - key: MURF_LOCALE

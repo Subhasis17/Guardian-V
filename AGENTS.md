@@ -1,5 +1,11 @@
 # Guardian Engineering Contract
 
+Voice picker update: curated English choices, all native voices across eight available Indian languages, and one voice per available gender for each other language. Underlying profiles remain available for saved sessions. Current default picker has 77 entries including auto-detect.
+
+
+Registration privacy update: new signup collects age/address and requires versioned explicit consent. Profiles use authenticated encryption; username lookup is keyed, and profile responses are masked. GUARDIAN_PII_ENCRYPTION_KEY must remain stable. Existing users remain compatible; legacy username migration occurs on login. HTTPS protects remote submissions. This scope does not encrypt legacy incident/contact data or establish production privacy compliance. Self-service deletion/withdrawal remains pending.
+
+
 2026-11-21 review fixes: bank outages preserve local approvals/history with explicit unavailable state; Google-connected incident creation requires a contact; calendar approvals include full times and offsets. Existing mock-bank accounts use read-only snapshots. Voice terminal polling and failed-stop feedback are handled. Render defines the separate authenticated bank; its assigned HTTPS URL still requires configuration. Live deployment/provider verification remains pending.
 
 2026-11-21 follow-ups: new incidents have persisted per-event reminder series.

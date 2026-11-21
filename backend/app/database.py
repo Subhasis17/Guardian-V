@@ -67,6 +67,7 @@ def init_db():
     with db() as conn:
         conn.executescript("""
             CREATE TABLE IF NOT EXISTS users (id TEXT PRIMARY KEY, username TEXT UNIQUE NOT NULL, salt TEXT NOT NULL, password_hash TEXT NOT NULL, tool_token TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS registration_profiles (user_id TEXT PRIMARY KEY REFERENCES users(id), encrypted_profile TEXT NOT NULL, consent_version TEXT NOT NULL, consent_at TEXT NOT NULL);
             CREATE TABLE IF NOT EXISTS operator (id INTEGER PRIMARY KEY CHECK(id=1), username TEXT NOT NULL, salt TEXT NOT NULL, password_hash TEXT NOT NULL);
             CREATE TABLE IF NOT EXISTS auth_sessions (token_hash TEXT PRIMARY KEY, csrf TEXT NOT NULL, expires_at REAL NOT NULL, last_seen REAL NOT NULL);
             CREATE TABLE IF NOT EXISTS google_oauth (id INTEGER PRIMARY KEY CHECK (id=1), state_hash TEXT, state_expires_at REAL, refresh_token TEXT, scopes TEXT, connected_at TEXT);

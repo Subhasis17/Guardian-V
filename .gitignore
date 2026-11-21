@@ -16,3 +16,4 @@ mock-bank/logs/
 *.tsbuildinfo
 .vscode
 .tmp/
+/docs

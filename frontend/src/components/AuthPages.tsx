@@ -6,7 +6,7 @@ type Props = {
 };
 
 export function AuthPages({request, onSignedIn}: Props) {
-  const [page, setPage] = useState<'register' | 'login' | 'consent'>('register');
+  const [page, setPage] = useState<'register' | 'login' | 'consent'>('login');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [age, setAge] = useState('');
@@ -24,21 +24,27 @@ export function AuthPages({request, onSignedIn}: Props) {
     setError('');
     if (page === 'register') { setPage('consent'); return; }
     setBusy(true);
+    let registered = false;
     try {
       if (page === 'consent') {
         if (!accepted || !notice) return;
         await request('/api/auth/register', {method: 'POST', body: JSON.stringify({username, password, age: Number(age), address, consent: accepted, consent_version: notice.version})});
+        registered = true;
       }
       const session = await request<{csrf_token: string}>('/api/auth/login', {method: 'POST', body: JSON.stringify({username, password})});
       setPassword(''); setAddress(''); setAge('');
       onSignedIn(session.csrf_token);
     } catch (e) {
-      if (page === 'login') {
-        setPage('register'); setPassword('');
-        setError('Sign-in was unsuccessful. New here? Complete registration below. Already registered? Choose Sign in to retry.');
+      const failure = e as {status?: number; code?: string};
+      if (page === 'login' && failure.status === 401 && failure.code === 'account_not_found') {
+        setPage('register'); setPassword(''); setAccepted(false);
+        setError('No account was found for this username. Complete registration to get started.');
+      } else if ((page === 'consent' && failure.status === 409) || registered) {
+        setPage('login'); setPassword(''); setAge(''); setAddress(''); setAccepted(false);
+        setError(registered ? 'Account created. Please sign in to continue.' : 'This username is already registered. Sign in instead.');
       } else {
         setAccepted(false);
-        setError(e instanceof Error ? e.message : 'Could not create your account.');
+        setError(e instanceof Error ? e.message : 'Could not complete your request.');
       }
     } finally { setBusy(false); }
   }
@@ -46,6 +52,10 @@ export function AuthPages({request, onSignedIn}: Props) {
   return <section className="auth-layout">
     <aside className="auth-intro"><p className="eyebrow">GUARDIAN · YOUR NEXT SAFE STEP</p><h2>A calm place to begin.</h2><p>Talk through what happened, review a plan, and stay in control of every action.</p><ul><li>Private account access</li><li>Approval before sensitive actions</li><li>Protected profile details</li></ul></aside>
     <form className="panel auth-form" onSubmit={submit}>
+      <nav className="auth-switch" aria-label="Account access">
+        <button type="button" aria-pressed={page === 'login'} disabled={busy} onClick={() => {setPage('login'); setPassword(''); setAccepted(false); setError('');}}>Login</button>
+        <button type="button" aria-pressed={page !== 'login'} disabled={busy} onClick={() => {setPage('register'); setPassword(''); setAccepted(false); setError('');}}>Register</button>
+      </nav>
       <p className="eyebrow">{page === 'consent' ? 'STEP 2 OF 2' : page === 'register' ? 'STEP 1 OF 2' : 'WELCOME BACK'}</p>
       <h2>{page === 'consent' ? 'Your information, your choice' : page === 'register' ? 'Create your account' : 'Sign in'}</h2>
       {page === 'consent' ? <>

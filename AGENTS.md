@@ -1,5 +1,8 @@
 # Guardian Engineering Contract
 
+Login/profile fix: login is the initial view with explicit Login/Register navigation. Unknown-account login opens registration; incorrect passwords stay on login, and duplicate registration returns to login. Authenticated users see the masked profile panel and can toggle it from the header. Browser checks cover all of these paths.
+
+
 Voice picker update: curated English choices, all native voices across eight available Indian languages, and one voice per available gender for each other language. Underlying profiles remain available for saved sessions. Current default picker has 77 entries including auto-detect.
 
 

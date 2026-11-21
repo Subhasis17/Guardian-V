@@ -1,3 +1,4 @@
+import { ProfilePanel } from "./components/ProfilePanel";
 import { AuthPages } from "./components/AuthPages";
 import { PendingApprovals } from "./components/PendingApprovals";
 import { useVoice } from "./hooks/useVoice";
@@ -11,6 +12,7 @@ const API = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8000").replace(
 
 export default function App() {
   const [token, setToken] = useState("");
+  const [showProfile, setShowProfile] = useState(true);
   const [google, setGoogle] = useState<{connected: boolean; trusted_contact_email: string} | null>(null);
   const [contactEmail, setContactEmail] = useState("");
   const [context, setContext] = useState<Context | null>(null);
@@ -43,8 +45,13 @@ export default function App() {
       if (response.status === 401) { setToken(""); setContext(null); setRun(null); }
       const body = await response.text();
       let detail = `Request failed (${response.status})`;
-      try { detail = JSON.parse(body).detail ?? detail; } catch { /* Proxies may return HTML or an empty body. */ }
-      throw new Error(detail);
+      let code: string | undefined;
+      try {
+        const data = JSON.parse(body).detail;
+        detail = typeof data === 'string' ? data : data?.message ?? detail;
+        code = typeof data === 'object' ? data?.code : undefined;
+      } catch { /* Proxies may return HTML or an empty body. */ }
+      throw Object.assign(new Error(detail), {status: response.status, code});
     }
     return response.json();
   }
@@ -210,9 +217,7 @@ export default function App() {
         <span className="sandbox">
           <i /> DEMO SANDBOX
         </span>
-        <button className="profile" aria-label="Profile">
-          A
-        </button>
+        {token && <button className="profile" aria-label="Toggle profile" aria-expanded={showProfile} aria-controls="account-profile" onClick={() => setShowProfile(value => !value)}>Profile</button>}
       </header>
       <section className="welcome">
         <div>
@@ -243,6 +248,7 @@ export default function App() {
 
       {token && (
         <>
+          {showProfile && <ProfilePanel request={request} />}
           {context?.bank_available === false && <p role="status">Sandbox bank unavailable. Account state and transactions cannot be verified. Your saved incidents and approvals remain available.</p>}
           <section className="panel google-panel">
             <h2>Google email and calendar</h2>

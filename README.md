@@ -157,7 +157,7 @@ The Blueprint includes a free authenticated mock-bank web service and shares its
 
 ## Registration and profile privacy
 
-New visitors start on Create an account. Existing users choose Sign in. An unsuccessful sign-in opens registration with a generic message and a link to retry login; the API does not expose a username-existence endpoint.
+The landing page opens Sign in and always shows Login and Register choices. An unknown username opens registration and preserves the entered username. A wrong password for an existing username stays on login. Attempting to register an existing username returns to login. Successful registration signs in automatically. The signed-in profile panel shows masked username, age and address, and the header Profile button toggles it. Login errors carry explicit account_not_found or invalid_credentials codes to support this requested routing.
 
 Registration requires username, password, age (1?120), address, and explicit acceptance of the versioned privacy notice. Details stay in browser memory until Agree & create account. The server validates consent and records its version and UTC timestamp. Declining returns to the form without creating an account.
 

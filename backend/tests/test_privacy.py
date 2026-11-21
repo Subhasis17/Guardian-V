@@ -21,7 +21,13 @@ def test_consent_encryption_masking_and_login(tmp_path, monkeypatch):
         assert all(value not in profile['encrypted_profile'] for value in ['Private Street', 'private-user'])
         assert profile['consent_version'] == privacy.CONSENT_VERSION and profile['consent_at']
         assert privacy.cipher().decrypt(profile['encrypted_profile'].encode())
-        assert client.post('/api/auth/login', json={'username': 'private-user', 'password': 'wrong'}).status_code == 401
+        wrong = client.post('/api/auth/login', json={'username': 'private-user', 'password': 'wrong'})
+        assert wrong.status_code == 401
+        assert wrong.json()['detail']['code'] == 'invalid_credentials'
+        missing = client.post('/api/auth/login', json={'username': 'missing-user', 'password': 'wrong'})
+        assert missing.status_code == 401
+        assert missing.json()['detail']['code'] == 'account_not_found'
+        assert client.post('/api/auth/register', json=payload).status_code == 409
         login = client.post('/api/auth/login', json=payload)
         assert login.status_code == 200
         result = client.get('/api/auth/profile')

@@ -89,7 +89,9 @@ def login(payload: Login, request: Request, response: Response):
         if not row or not hmac.compare_digest(password_hash(payload.password, row["salt"]), row["password_hash"]) or not matches:
             conn.execute("INSERT INTO login_attempts VALUES (?,?)", (address, now))
             conn.commit()
-            raise HTTPException(401, "Invalid username or password.")
+            if not matches:
+                raise HTTPException(401, {"code": "account_not_found", "message": "Account not found. Create an account to continue."})
+            raise HTTPException(401, {"code": "invalid_credentials", "message": "Incorrect password. Please try signing in again."})
         conn.execute("DELETE FROM auth_sessions WHERE token_hash=? OR expires_at<? OR last_seen<?", (digest(request.cookies.get("guardian_session", "")), now, now - 1800))
         token, csrf = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
         if protected and row['user_id'] != 'demo-user':

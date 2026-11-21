@@ -29,6 +29,7 @@ def sandbox_bank(tmp_path, monkeypatch):
     monkeypatch.setattr(module, "DB_PATH", tmp_path / "bank.db")
     monkeypatch.setenv("MOCK_BANK_URL", "http://bank.test")
     monkeypatch.setenv("MOCK_BANK_SERVICE_SECRET", "test-bank-service-secret")
+    monkeypatch.setattr(bank, "start_warmup", lambda: None)
     with TestClient(module.app) as client:
         monkeypatch.setattr(bank.httpx, "request", lambda method, url, **kwargs: client.request(method, url, **kwargs))
         yield client

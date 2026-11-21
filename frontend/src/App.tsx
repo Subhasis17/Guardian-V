@@ -12,7 +12,7 @@ const API = (import.meta.env.VITE_API_URL || "http://127.0.0.1:8000").replace(
 
 export default function App() {
   const [token, setToken] = useState("");
-  const [showProfile, setShowProfile] = useState(true);
+  const [showProfile, setShowProfile] = useState(false);
   const [google, setGoogle] = useState<{connected: boolean; trusted_contact_email: string} | null>(null);
   const [contactEmail, setContactEmail] = useState("");
   const [context, setContext] = useState<Context | null>(null);
@@ -23,6 +23,7 @@ export default function App() {
   const [shadowDueOn, setShadowDueOn] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+  const contextLoading = useRef(false);
   const incidentRequest = useRef<{ summary: string; key: string } | null>(null);
   async function request<T>(
     path: string,
@@ -67,7 +68,8 @@ export default function App() {
   } = useVoice({ token, request, setBusy, setError });
 
   async function loadContext() {
-    if (!token) return;
+    if (!token || contextLoading.current) return;
+    contextLoading.current = true;
     try {
       setContext(await request<Context>("/api/context"));
       setError("");
@@ -75,6 +77,8 @@ export default function App() {
       setError(
         e instanceof Error ? e.message : "Could not load Guardian data.",
       );
+    } finally {
+      contextLoading.current = false;
     }
   }
 
@@ -217,7 +221,7 @@ export default function App() {
         <span className="sandbox">
           <i /> DEMO SANDBOX
         </span>
-        {token && <button className="profile" aria-label="Toggle profile" aria-expanded={showProfile} aria-controls="account-profile" onClick={() => setShowProfile(value => !value)}>Profile</button>}
+        {token && <button className="profile" aria-label="Profile settings" aria-expanded={showProfile} aria-controls="account-profile" onClick={() => setShowProfile(value => !value)}>Profile & settings</button>}
       </header>
       <section className="welcome">
         <div>
@@ -230,7 +234,7 @@ export default function App() {
         <span className="date">INCIDENT RESPONSE</span>
       </section>
 
-      {!token && <AuthPages request={request} onSignedIn={csrf => {setToken(csrf); setError("");}} />}
+      {!token && <AuthPages request={request} onSignedIn={csrf => {setToken(csrf); setShowProfile(false); setError("");}} />}
 
       {error && (
         <div className="error" role="alert">
@@ -248,10 +252,10 @@ export default function App() {
 
       {token && (
         <>
-          {showProfile && <ProfilePanel request={request} />}
-          {context?.bank_available === false && <p role="status">Sandbox bank unavailable. Account state and transactions cannot be verified. Your saved incidents and approvals remain available.</p>}
-          <section className="panel google-panel">
-            <h2>Google email and calendar</h2>
+          {google && (!google.connected || !google.trusted_contact_email) && !showProfile && <section className="setup-prompt" aria-label="Account setup"><p>Finish account setup to enable approved email notifications and Calendar follow-ups.</p><button className="secondary" type="button" onClick={() => setShowProfile(true)}>Open profile settings</button></section>}
+          {showProfile && <ProfilePanel request={request}>
+          <section className="profile-integrations">
+            <h3>Google connection & trusted contact</h3>
             <p>{google?.connected ? "Connected to your Google account." : "Connect your Google account to send approved notifications and create follow-ups."}</p>
             {!google?.connected && <a className="google-connect" href={`${API}/api/integrations/google/connect`}><span className="google-mark" aria-hidden="true">G</span>Connect Google</a>}
             {google?.connected && <button className="secondary" type="button" onClick={() => void disconnectGoogle()}>Disconnect Google</button>}
@@ -261,6 +265,8 @@ export default function App() {
             </div>
             <small>Approved emails go to this contact. Follow-ups appear in your connected Google Calendar.</small>
           </section>
+          </ProfilePanel>}
+          {context?.bank_available === false && <div className="bank-status" role="status"><p>{context.bank_warming ? 'Connecting to the sandbox bank. It may be waking up. We will retry automatically.' : 'Sandbox bank unavailable. Account state and transactions cannot be verified. Your saved incidents and approvals remain available.'}</p><button className="secondary" type="button" onClick={() => void loadContext()}>Retry bank connection</button></div>}
           <section className="voice-card">
             <div className="voice-copy">
               <span className="live-label">

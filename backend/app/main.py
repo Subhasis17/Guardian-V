@@ -18,6 +18,8 @@ from app.api import incidents, tools, voice, auth, integrations
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
     init_db()
+    from app.adapters import bank
+    bank.start_warmup()
     yield
 
 

@@ -1,5 +1,8 @@
 # Guardian Engineering Contract
 
+Bank/settings update: a single bounded background read-only health probe handles free-service wake-up without retrying actions. Bank read failures log safe error types/status. The dashboard distinguishes connecting from unavailable and keeps local approvals accessible. Google connection/contact editing is inside profile settings, with an incomplete-setup prompt only. 37 backend tests and browser UI checks passed; free-service cold-start delays and ephemeral storage remain limits.
+
+
 Login/profile fix: login is the initial view with explicit Login/Register navigation. Unknown-account login opens registration; incorrect passwords stay on login, and duplicate registration returns to login. Authenticated users see the masked profile panel and can toggle it from the header. Browser checks cover all of these paths.
 
 

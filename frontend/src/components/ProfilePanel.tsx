@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 type Profile = {username: string; age: string; address: string};
-type Props = {request: <T>(path: string, options?: RequestInit) => Promise<T>};
+type Props = {request: <T>(path: string, options?: RequestInit) => Promise<T>; children?: ReactNode};
 
-export function ProfilePanel({request}: Props) {
+export function ProfilePanel({request, children}: Props) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [error, setError] = useState('');
   const [attempt, setAttempt] = useState(0);
@@ -22,5 +22,6 @@ export function ProfilePanel({request}: Props) {
       <div><dt>Age</dt><dd>{profile.age}</dd></div>
       <div><dt>Address</dt><dd>{profile.address}</dd></div>
     </dl> : <p role="status">Loading profile?</p>}
+    {children}
   </section>;
 }

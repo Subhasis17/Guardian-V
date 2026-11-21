@@ -181,3 +181,11 @@ The deployed callback is https://guardian-api-j55w.onrender.com/api/integrations
 Register it exactly under Authorized redirect URIs for the deployment Google
 OAuth client. The application does not automatically select the deployment
 variables during local startup.
+
+## Bank startup and profile settings
+
+The API probes the separate bank's /health endpoint in a background daemon on startup and after transient read failures. Only one warm-up runs per API process, with a bounded 70-second read timeout to accommodate free Render cold starts. Normal bank requests retain a five-second timeout; financial sandbox actions are never replayed by warm-up. A bad service credential is logged and is not treated as a cold start.
+
+The dashboard distinguishes a bank connection in progress from an unavailable bank, keeps local incidents/approvals visible and retries without overlapping context requests. A Retry bank connection button is also available. A free service may still need about a minute to wake, and permanent failures remain explicit. This does not provide durable bank storage.
+
+Google connection and trusted-contact editing live under Profile & settings. Signed-in users with incomplete setup see a small setup prompt. Once both Google connection and a saved contact are present, the prompt disappears and these controls remain accessible only when the user opens profile settings.

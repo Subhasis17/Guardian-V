@@ -25,6 +25,7 @@ export type Run = {
 };
 export type Context = {
   bank_available?: boolean;
+  bank_warming?: boolean;
   bank_error?: string | null;
   profile: { name: string; trusted_contact: string };
   account: { card_frozen: boolean | null };

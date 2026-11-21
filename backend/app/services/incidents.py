@@ -72,6 +72,7 @@ def context(user=Depends(require_demo_auth)):
         },
         "account": banking["account"],
         "bank_available": bank_error is None,
+        "bank_warming": bank_error is not None and bank.is_warming(),
         "bank_error": bank_error,
         "transactions": banking["transactions"],
         "incidents": incidents,

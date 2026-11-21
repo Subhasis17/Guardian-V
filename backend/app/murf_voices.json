@@ -1,0 +1,1371 @@
+[
+  {
+    "voiceId": "pa-IN-harman",
+    "displayName": "Harman (M)",
+    "locale": "pa-IN",
+    "displayLanguage": "Punjabi",
+    "supportedLocales": {
+      "kn-IN": "Kannada (India)",
+      "pa-IN": "Punjabi (India)"
+    }
+  },
+  {
+    "voiceId": "en-UK-sharon",
+    "displayName": "Sharon (F)",
+    "locale": "en-UK",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-UK": "English (UK)"
+    }
+  },
+  {
+    "voiceId": "en-US-alina",
+    "displayName": "Alina (F)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-UK-hazel",
+    "displayName": "Hazel (F)",
+    "locale": "en-UK",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-UK": "English (UK)"
+    }
+  },
+  {
+    "voiceId": "en-US-luna",
+    "displayName": "Luna (F)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "bn-IN-arnab",
+    "displayName": "Arnab (M)",
+    "locale": "bn-IN",
+    "displayLanguage": "Bangla",
+    "supportedLocales": {}
+  },
+  {
+    "voiceId": "en-AU-estelle",
+    "displayName": "Estelle (F)",
+    "locale": "en-AU",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-AU": "English (Australia)"
+    }
+  },
+  {
+    "voiceId": "en-US-wayne",
+    "displayName": "Wayne (M)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-US-daniel",
+    "displayName": "Daniel (M)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "hr-HR-marija",
+    "displayName": "Marija (F)",
+    "locale": "hr-HR",
+    "displayLanguage": "Croatian",
+    "supportedLocales": {
+      "hr-HR": "Croatian (Croatia)"
+    }
+  },
+  {
+    "voiceId": "en-IN-samar",
+    "displayName": "Samar (M)",
+    "locale": "en-IN",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "te-IN": "Telugu (India)",
+      "ar-XA": "Arabic (XA)",
+      "or-IN": "Odia (India)",
+      "hi-IN": "Hindi (India)",
+      "as-IN": "Assamese (India)",
+      "mr-IN": "Marathi (India)",
+      "ta-IN": "Tamil (India)",
+      "kn-IN": "Kannada (India)",
+      "en-IN": "English (India)",
+      "hi-LATN": "Hinglish (India)"
+    }
+  },
+  {
+    "voiceId": "hi-IN-khyati",
+    "displayName": "Khyati (F)",
+    "locale": "hi-IN",
+    "displayLanguage": "Hindi",
+    "supportedLocales": {
+      "hi-IN": "Hindi (India)"
+    }
+  },
+  {
+    "voiceId": "en-US-zion",
+    "displayName": "Zion (M)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-IN-isha",
+    "displayName": "Isha (F)",
+    "locale": "en-IN",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "hi-IN": "Hindi (India)"
+    }
+  },
+  {
+    "voiceId": "ko-KR-hwan",
+    "displayName": "Hwan (M)",
+    "locale": "ko-KR",
+    "displayLanguage": "Korean",
+    "supportedLocales": {
+      "ko-KR": "Korean (South Korea)"
+    }
+  },
+  {
+    "voiceId": "fr-FR-adélie",
+    "displayName": "Adélie (F)",
+    "locale": "fr-FR",
+    "displayLanguage": "French",
+    "supportedLocales": {
+      "fr-FR": "French (France)"
+    }
+  },
+  {
+    "voiceId": "hi-IN-poonam",
+    "displayName": "Poonam (F)",
+    "locale": "hi-IN",
+    "displayLanguage": "Hindi",
+    "supportedLocales": {
+      "ta-IN": "Tamil (India)",
+      "bn-IN": "Bangla (India)",
+      "pa-IN": "Punjabi (India)",
+      "or-IN": "Odia (India)",
+      "ml-IN": "Malayalam (India)",
+      "gu-IN": "Gujarati (India)",
+      "mr-IN": "Marathi (India)",
+      "kn-IN": "Kannada (India)",
+      "as-IN": "Assamese (India)",
+      "en-IN": "English (India)",
+      "te-IN": "Telugu (India)",
+      "hi-IN": "Hindi (India)"
+    }
+  },
+  {
+    "voiceId": "en-US-jeff",
+    "displayName": "Jeff (M)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-UK-juliet",
+    "displayName": "Juliet (F)",
+    "locale": "en-UK",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-UK": "English (UK)"
+    }
+  },
+  {
+    "voiceId": "en-IN-arohi",
+    "displayName": "Arohi (F)",
+    "locale": "en-IN",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "hi-IN": "Hindi (India)"
+    }
+  },
+  {
+    "voiceId": "en-UK-hugo",
+    "displayName": "Hugo (M)",
+    "locale": "en-UK",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-UK": "English (UK)"
+    }
+  },
+  {
+    "voiceId": "hi-IN-neeta",
+    "displayName": "Neeta (F)",
+    "locale": "hi-IN",
+    "displayLanguage": "Hindi",
+    "supportedLocales": {
+      "ta-IN": "Tamil (India)",
+      "bn-IN": "Bangla (India)",
+      "pa-IN": "Punjabi (India)",
+      "or-IN": "Odia (India)",
+      "ml-IN": "Malayalam (India)",
+      "gu-IN": "Gujarati (India)",
+      "mr-IN": "Marathi (India)",
+      "kn-IN": "Kannada (India)",
+      "as-IN": "Assamese (India)",
+      "en-IN": "English (India)",
+      "te-IN": "Telugu (India)",
+      "hi-IN": "Hindi (India)"
+    }
+  },
+  {
+    "voiceId": "en-US-ezekiel",
+    "displayName": "Ezekiel (M)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-IN-nikhil",
+    "displayName": "Nikhil (M)",
+    "locale": "en-IN",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "kn-IN": "Kannada (India)",
+      "hi-IN": "Hindi (India)",
+      "en-IN": "English (India)",
+      "hi-LATN": "Hinglish (India)"
+    }
+  },
+  {
+    "voiceId": "en-IN-anisha",
+    "displayName": "Anisha (F)",
+    "locale": "en-IN",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "te-IN": "Telugu (India)",
+      "pa-IN": "Punjabi (India)",
+      "or-IN": "Odia (India)",
+      "bn-IN": "Bangla (India)",
+      "hi-IN": "Hindi (India)",
+      "as-IN": "Assamese (India)",
+      "ta-IN": "Tamil (India)",
+      "mr-IN": "Marathi (India)",
+      "en-IN": "English (India)",
+      "hi-LATN": "Hinglish (India)"
+    }
+  },
+  {
+    "voiceId": "pt-BR-isadora",
+    "displayName": "Isadora (F)",
+    "locale": "pt-BR",
+    "displayLanguage": "Portuguese",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)",
+      "pt-BR": "Portuguese (Brazil)"
+    }
+  },
+  {
+    "voiceId": "it-IT-vincenzo",
+    "displayName": "Vincenzo (M)",
+    "locale": "it-IT",
+    "displayLanguage": "Italian",
+    "supportedLocales": {
+      "it-IT": "Italian (Italy)"
+    }
+  },
+  {
+    "voiceId": "kn-IN-harshitha",
+    "displayName": "Harshitha (F)",
+    "locale": "kn-IN",
+    "displayLanguage": "Kannada",
+    "supportedLocales": {
+      "kn-IN": "Kannada (India)"
+    }
+  },
+  {
+    "voiceId": "hi-IN-chirag",
+    "displayName": "Chirag (M)",
+    "locale": "hi-IN",
+    "displayLanguage": "Hindi",
+    "supportedLocales": {
+      "as-IN": "Assamese (India)",
+      "pa-IN": "Punjabi (India)",
+      "kn-IN": "Kannada (India)",
+      "or-IN": "Odia (India)",
+      "en-IN": "English (India)",
+      "te-IN": "Telugu (India)",
+      "ml-IN": "Malayalam (India)",
+      "gu-IN": "Gujarati (India)",
+      "bn-IN": "Bangla (India)",
+      "mr-IN": "Marathi (India)",
+      "ta-IN": "Tamil (India)",
+      "hi-IN": "Hindi (India)"
+    }
+  },
+  {
+    "voiceId": "en-AU-connor",
+    "displayName": "Connor (M)",
+    "locale": "en-AU",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-AU": "English (Australia)"
+    }
+  },
+  {
+    "voiceId": "en-UK-heidi",
+    "displayName": "Heidi (F)",
+    "locale": "en-UK",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "de-DE": "German (Germany)",
+      "bg-BG": "Bulgarian (Bulgaria)",
+      "cs-CZ": "Czech (Czech Republic)",
+      "en-US": "English (US & Canada)",
+      "ar-XA": "Arabic (XA)",
+      "es-MX": "Spanish (Mexico)",
+      "nl-BE": "Dutch (Belgium)",
+      "sv-SE": "Swedish (Sweden)",
+      "tl-PH": "Tagalog (Philippines)",
+      "en-UK": "English (UK)"
+    }
+  },
+  {
+    "voiceId": "en-US-miles",
+    "displayName": "Miles (M)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-US-calvin",
+    "displayName": "Calvin (M)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-US-abigail",
+    "displayName": "Abigail (F)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "fr-FR-justine",
+    "displayName": "Justine (F)",
+    "locale": "fr-FR",
+    "displayLanguage": "French",
+    "supportedLocales": {
+      "fr-FR": "French (France)"
+    }
+  },
+  {
+    "voiceId": "it-IT-giulia",
+    "displayName": "Giulia (F)",
+    "locale": "it-IT",
+    "displayLanguage": "Italian",
+    "supportedLocales": {
+      "it-IT": "Italian (Italy)"
+    }
+  },
+  {
+    "voiceId": "nl-NL-famke",
+    "displayName": "Famke (F)",
+    "locale": "nl-NL",
+    "displayLanguage": "Dutch",
+    "supportedLocales": {
+      "nl-NL": "Dutch (Netherlands)"
+    }
+  },
+  {
+    "voiceId": "en-AU-ivy",
+    "displayName": "Ivy (F)",
+    "locale": "en-AU",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-AU": "English (Australia)"
+    }
+  },
+  {
+    "voiceId": "nl-NL-dirk",
+    "displayName": "Dirk (M)",
+    "locale": "nl-NL",
+    "displayLanguage": "Dutch",
+    "supportedLocales": {
+      "nl-NL": "Dutch (Netherlands)"
+    }
+  },
+  {
+    "voiceId": "fr-FR-axel",
+    "displayName": "Axel (M)",
+    "locale": "fr-FR",
+    "displayLanguage": "French",
+    "supportedLocales": {
+      "es-MX": "Spanish (Mexico)",
+      "fr-FR": "French (France)"
+    }
+  },
+  {
+    "voiceId": "fr-FR-guillaume",
+    "displayName": "Guillaume (M)",
+    "locale": "fr-FR",
+    "displayLanguage": "French",
+    "supportedLocales": {
+      "fr-FR": "French (France)"
+    }
+  },
+  {
+    "voiceId": "ja-JP-denki",
+    "displayName": "Denki (M)",
+    "locale": "ja-JP",
+    "displayLanguage": "Japanese",
+    "supportedLocales": {
+      "ja-JP": "Japanese (Japan)"
+    }
+  },
+  {
+    "voiceId": "hi-IN-jaya",
+    "displayName": "Jaya (F)",
+    "locale": "hi-IN",
+    "displayLanguage": "Hindi",
+    "supportedLocales": {
+      "ta-IN": "Tamil (India)",
+      "bn-IN": "Bangla (India)",
+      "pa-IN": "Punjabi (India)",
+      "or-IN": "Odia (India)",
+      "ml-IN": "Malayalam (India)",
+      "gu-IN": "Gujarati (India)",
+      "mr-IN": "Marathi (India)",
+      "kn-IN": "Kannada (India)",
+      "as-IN": "Assamese (India)",
+      "en-IN": "English (India)",
+      "te-IN": "Telugu (India)",
+      "hi-IN": "Hindi (India)"
+    }
+  },
+  {
+    "voiceId": "es-ES-elvira",
+    "displayName": "Elvira (F)",
+    "locale": "es-ES",
+    "displayLanguage": "Spanish",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "gu-IN-diya",
+    "displayName": "Diya (F)",
+    "locale": "gu-IN",
+    "displayLanguage": "Gujarati",
+    "supportedLocales": {
+      "ro-RO": "Romanian (Romania)",
+      "ml-IN": "Malayalam (India)",
+      "ms-MY": "Malay (Malaysia)",
+      "id-ID": "Indonesian (Indonesia)",
+      "sv-SE": "Swedish (Sweden)",
+      "ar-XA": "Arabic (XA)",
+      "bg-BG": "Bulgarian (Bulgaria)",
+      "fr-FR": "French (France)",
+      "vi-VN": "Vietnamese (Vietnam)",
+      "it-IT": "Italian (Italy)",
+      "cs-CZ": "Czech (Czech Republic)",
+      "nl-BE": "Dutch (Belgium)",
+      "mr-IN": "Marathi (India)",
+      "gu-IN": "Gujarati (India)"
+    }
+  },
+  {
+    "voiceId": "hi-IN-shweta",
+    "displayName": "Shweta (F)",
+    "locale": "hi-IN",
+    "displayLanguage": "Hindi",
+    "supportedLocales": {
+      "hi-IN": "Hindi (India)"
+    }
+  },
+  {
+    "voiceId": "en-AU-jimm",
+    "displayName": "Jimm (M)",
+    "locale": "en-AU",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-AU": "English (Australia)"
+    }
+  },
+  {
+    "voiceId": "en-UK-pearl",
+    "displayName": "Pearl (F)",
+    "locale": "en-UK",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-UK": "English (UK)"
+    }
+  },
+  {
+    "voiceId": "en-UK-benedict",
+    "displayName": "Benedict (M)",
+    "locale": "en-UK",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "ro-RO": "Romanian (Romania)",
+      "en-UK": "English (UK)"
+    }
+  },
+  {
+    "voiceId": "pt-BR-benício",
+    "displayName": "Benício (M)",
+    "locale": "pt-BR",
+    "displayLanguage": "Portuguese",
+    "supportedLocales": {
+      "pt-BR": "Portuguese (Brazil)"
+    }
+  },
+  {
+    "voiceId": "en-UK-freddie",
+    "displayName": "Freddie (M)",
+    "locale": "en-UK",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-UK": "English (UK)"
+    }
+  },
+  {
+    "voiceId": "hi-IN-rachna",
+    "displayName": "Rachna (F)",
+    "locale": "hi-IN",
+    "displayLanguage": "Hindi",
+    "supportedLocales": {
+      "ta-IN": "Tamil (India)",
+      "bn-IN": "Bangla (India)",
+      "pa-IN": "Punjabi (India)",
+      "ml-IN": "Malayalam (India)",
+      "gu-IN": "Gujarati (India)",
+      "mr-IN": "Marathi (India)",
+      "kn-IN": "Kannada (India)",
+      "en-IN": "English (India)",
+      "te-IN": "Telugu (India)",
+      "hi-IN": "Hindi (India)"
+    }
+  },
+  {
+    "voiceId": "pt-BR-eloa",
+    "displayName": "Eloa (F)",
+    "locale": "pt-BR",
+    "displayLanguage": "Portuguese",
+    "supportedLocales": {
+      "pt-BR": "Portuguese (Brazil)"
+    }
+  },
+  {
+    "voiceId": "en-AU-maeve",
+    "displayName": "Maeve (F)",
+    "locale": "en-AU",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-AU": "English (Australia)"
+    }
+  },
+  {
+    "voiceId": "hi-IN-namrita",
+    "displayName": "Namrita (F)",
+    "locale": "hi-IN",
+    "displayLanguage": "Hindi",
+    "supportedLocales": {
+      "kn-IN": "Kannada (India)",
+      "tr-TR": "Turkish (Turkey)",
+      "hi-IN": "Hindi (India)"
+    }
+  },
+  {
+    "voiceId": "en-US-natalie",
+    "displayName": "Natalie (F)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-UK-joshua",
+    "displayName": "Joshua (M)",
+    "locale": "en-UK",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)",
+      "fr-FR": "French (France)",
+      "es-MX": "Spanish (Mexico)",
+      "en-UK": "English (UK)"
+    }
+  },
+  {
+    "voiceId": "en-US-michelle",
+    "displayName": "Michelle (F)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-US-phoebe",
+    "displayName": "Phoebe (F)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "bn-IN-subhankar",
+    "displayName": "Subhankar (M)",
+    "locale": "bn-IN",
+    "displayLanguage": "Bangla",
+    "supportedLocales": {
+      "mr-IN": "Marathi (India)",
+      "bn-IN": "Bangla (India)"
+    }
+  },
+  {
+    "voiceId": "es-ES-carmen",
+    "displayName": "Carmen (F)",
+    "locale": "es-ES",
+    "displayLanguage": "Spanish",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)",
+      "es-ES": "Spanish (Spain)"
+    }
+  },
+  {
+    "voiceId": "en-IN-abhinav",
+    "displayName": "Abhinav (M)",
+    "locale": "en-IN",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "ml-IN": "Malayalam (India)",
+      "hi-IN": "Hindi (India)",
+      "mr-IN": "Marathi (India)",
+      "en-IN": "English (India)",
+      "hi-LATN": "Hinglish (India)"
+    }
+  },
+  {
+    "voiceId": "en-US-caleb",
+    "displayName": "Caleb (M)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "hi-IN-pranav",
+    "displayName": "Pranav (M)",
+    "locale": "hi-IN",
+    "displayLanguage": "Hindi",
+    "supportedLocales": {
+      "pa-IN": "Punjabi (India)",
+      "kn-IN": "Kannada (India)",
+      "en-IN": "English (India)",
+      "te-IN": "Telugu (India)",
+      "ml-IN": "Malayalam (India)",
+      "gu-IN": "Gujarati (India)",
+      "bn-IN": "Bangla (India)",
+      "mr-IN": "Marathi (India)",
+      "ta-IN": "Tamil (India)",
+      "hi-IN": "Hindi (India)"
+    }
+  },
+  {
+    "voiceId": "en-US-josie",
+    "displayName": "Josie (F)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-US-ariana",
+    "displayName": "Ariana (F)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-US-daisy",
+    "displayName": "Daisy (F)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "sk-SK-tibor",
+    "displayName": "Tibor (M)",
+    "locale": "sk-SK",
+    "displayLanguage": "Slovak",
+    "supportedLocales": {
+      "sk-SK": "Slovak (Slovakia)"
+    }
+  },
+  {
+    "voiceId": "en-SCOTT-emily",
+    "displayName": "Emily (F)",
+    "locale": "en-SCOTT",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-SCOTT": "English (Scotland)"
+    }
+  },
+  {
+    "voiceId": "es-MX-valeria",
+    "displayName": "Valeria (F)",
+    "locale": "es-MX",
+    "displayLanguage": "Spanish",
+    "supportedLocales": {
+      "es-MX": "Spanish (Mexico)"
+    }
+  },
+  {
+    "voiceId": "en-IN-eashwar",
+    "displayName": "Eashwar (M)",
+    "locale": "en-IN",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "hi-IN": "Hindi (India)"
+    }
+  },
+  {
+    "voiceId": "de-DE-lara",
+    "displayName": "Lara (F)",
+    "locale": "de-DE",
+    "displayLanguage": "German",
+    "supportedLocales": {
+      "es-MX": "Spanish (Mexico)",
+      "en-US": "English (US & Canada)",
+      "de-DE": "German (Germany)"
+    }
+  },
+  {
+    "voiceId": "en-US-grant",
+    "displayName": "Grant (M)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-SCOTT-rory",
+    "displayName": "Rory (M)",
+    "locale": "en-SCOTT",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-SCOTT": "English (Scotland)"
+    }
+  },
+  {
+    "voiceId": "pt-BR-yago",
+    "displayName": "Yago (M)",
+    "locale": "pt-BR",
+    "displayLanguage": "Portuguese",
+    "supportedLocales": {
+      "pt-BR": "Portuguese (Brazil)"
+    }
+  },
+  {
+    "voiceId": "en-AU-leyton",
+    "displayName": "Leyton (M)",
+    "locale": "en-AU",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-AU": "English (Australia)"
+    }
+  },
+  {
+    "voiceId": "ko-KR-minseo",
+    "displayName": "Minseo (F)",
+    "locale": "ko-KR",
+    "displayLanguage": "Korean",
+    "supportedLocales": {
+      "ja-JP": "Japanese (Japan)",
+      "ko-KR": "Korean (South Korea)"
+    }
+  },
+  {
+    "voiceId": "fr-CA-clément",
+    "displayName": "Clément (M)",
+    "locale": "fr-CA",
+    "displayLanguage": "French",
+    "supportedLocales": {
+      "fr-CA": "French (Canada)"
+    }
+  },
+  {
+    "voiceId": "zh-CN-wei",
+    "displayName": "Wei (F)",
+    "locale": "zh-CN",
+    "displayLanguage": "Mandarin",
+    "supportedLocales": {
+      "zh-CN": "Mandarin (China)"
+    }
+  },
+  {
+    "voiceId": "en-US-lillian",
+    "displayName": "Lillian (F)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "pa-IN-harpreet",
+    "displayName": "Harpreet (F)",
+    "locale": "pa-IN",
+    "displayLanguage": "Punjabi",
+    "supportedLocales": {
+      "mr-IN": "Marathi (India)",
+      "pa-IN": "Punjabi (India)"
+    }
+  },
+  {
+    "voiceId": "ko-KR-gyeong",
+    "displayName": "Gyeong (F)",
+    "locale": "ko-KR",
+    "displayLanguage": "Korean",
+    "supportedLocales": {
+      "ko-KR": "Korean (South Korea)"
+    }
+  },
+  {
+    "voiceId": "it-IT-angelo",
+    "displayName": "Angelo (M)",
+    "locale": "it-IT",
+    "displayLanguage": "Italian",
+    "supportedLocales": {
+      "it-IT": "Italian (Italy)"
+    }
+  },
+  {
+    "voiceId": "en-US-seth",
+    "displayName": "Seth (M)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "gu-IN-hardik",
+    "displayName": "Hardik (M)",
+    "locale": "gu-IN",
+    "displayLanguage": "Gujarati",
+    "supportedLocales": {
+      "en-IN": "English (India)",
+      "gu-IN": "Gujarati (India)"
+    }
+  },
+  {
+    "voiceId": "es-MX-carlos",
+    "displayName": "Carlos (M)",
+    "locale": "es-MX",
+    "displayLanguage": "Spanish",
+    "supportedLocales": {
+      "sv-SE": "Swedish (Sweden)",
+      "en-US": "English (US & Canada)",
+      "ms-MY": "Malay (Malaysia)",
+      "cs-CZ": "Czech (Czech Republic)",
+      "de-DE": "German (Germany)",
+      "ro-RO": "Romanian (Romania)",
+      "bg-BG": "Bulgarian (Bulgaria)",
+      "th-TH": "Thai (Thailand)",
+      "nl-BE": "Dutch (Belgium)",
+      "it-IT": "Italian (Italy)",
+      "tl-PH": "Tagalog (Philippines)",
+      "fr-FR": "French (France)",
+      "es-MX": "Spanish (Mexico)"
+    }
+  },
+  {
+    "voiceId": "nl-NL-merel",
+    "displayName": "Merel (F)",
+    "locale": "nl-NL",
+    "displayLanguage": "Dutch",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)",
+      "nl-NL": "Dutch (Netherlands)"
+    }
+  },
+  {
+    "voiceId": "en-US-alicia",
+    "displayName": "Alicia (F)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "ro-RO": "Romanian (Romania)",
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-IN-alia",
+    "displayName": "Alia (F)",
+    "locale": "en-IN",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "te-IN": "Telugu (India)",
+      "hi-IN": "Hindi (India)"
+    }
+  },
+  {
+    "voiceId": "ml-IN-nimisha",
+    "displayName": "Nimisha (F)",
+    "locale": "ml-IN",
+    "displayLanguage": "Malayalam",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)",
+      "en-IN": "English (India)",
+      "ml-IN": "Malayalam (India)"
+    }
+  },
+  {
+    "voiceId": "pl-PL-blazej",
+    "displayName": "Blazej (M)",
+    "locale": "pl-PL",
+    "displayLanguage": "Polish",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)",
+      "pl-PL": "Polish (Poland)"
+    }
+  },
+  {
+    "voiceId": "mr-IN-prathamesh",
+    "displayName": "Prathamesh (M)",
+    "locale": "mr-IN",
+    "displayLanguage": "Marathi",
+    "supportedLocales": {
+      "hi-IN": "Hindi (India)",
+      "te-IN": "Telugu (India)",
+      "en-IN": "English (India)",
+      "mr-IN": "Marathi (India)",
+      "hi-LATN": "Hinglish (India)"
+    }
+  },
+  {
+    "voiceId": "el-GR-stavros",
+    "displayName": "Stavros (M)",
+    "locale": "el-GR",
+    "displayLanguage": "Greek",
+    "supportedLocales": {
+      "el-GR": "Greek (Greece)"
+    }
+  },
+  {
+    "voiceId": "en-AU-sophia",
+    "displayName": "Sophia (F)",
+    "locale": "en-AU",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-AU": "English (Australia)"
+    }
+  },
+  {
+    "voiceId": "en-IN-aarav",
+    "displayName": "Aarav (M)",
+    "locale": "en-IN",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "hi-IN": "Hindi (India)",
+      "en-IN": "English (India)"
+    }
+  },
+  {
+    "voiceId": "en-US-matthew",
+    "displayName": "Matthew (M)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "de-DE-björn",
+    "displayName": "Björn (M)",
+    "locale": "de-DE",
+    "displayLanguage": "German",
+    "supportedLocales": {
+      "vi-VN": "Vietnamese (Vietnam)",
+      "de-DE": "German (Germany)"
+    }
+  },
+  {
+    "voiceId": "bn-IN-ishani",
+    "displayName": "Ishani (F)",
+    "locale": "bn-IN",
+    "displayLanguage": "Bangla",
+    "supportedLocales": {
+      "hi-IN": "Hindi (India)"
+    }
+  },
+  {
+    "voiceId": "zh-CN-yuxan",
+    "displayName": "Yuxan (M)",
+    "locale": "zh-CN",
+    "displayLanguage": "Mandarin",
+    "supportedLocales": {
+      "zh-CN": "Mandarin (China)"
+    }
+  },
+  {
+    "voiceId": "en-UK-lydia",
+    "displayName": "Lydia (F)",
+    "locale": "en-UK",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-UK": "English (UK)"
+    }
+  },
+  {
+    "voiceId": "ml-IN-madhavan",
+    "displayName": "Madhavan (M)",
+    "locale": "ml-IN",
+    "displayLanguage": "Malayalam",
+    "supportedLocales": {
+      "hi-IN": "Hindi (India)",
+      "ml-IN": "Malayalam (India)"
+    }
+  },
+  {
+    "voiceId": "bn-IN-debarati",
+    "displayName": "Debarati (F)",
+    "locale": "bn-IN",
+    "displayLanguage": "Bangla",
+    "supportedLocales": {
+      "hi-IN": "Hindi (India)",
+      "bn-IN": "Bangla (India)"
+    }
+  },
+  {
+    "voiceId": "en-US-judith",
+    "displayName": "Judith (F)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "ro-RO": "Romanian (Romania)",
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-AU-harper",
+    "displayName": "Harper (M)",
+    "locale": "en-AU",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-AU": "English (Australia)"
+    }
+  },
+  {
+    "voiceId": "en-UK-ruby",
+    "displayName": "Ruby (F)",
+    "locale": "en-UK",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-UK": "English (UK)"
+    }
+  },
+  {
+    "voiceId": "ja-JP-kimi",
+    "displayName": "Kimi (F)",
+    "locale": "ja-JP",
+    "displayLanguage": "Japanese",
+    "supportedLocales": {
+      "ja-JP": "Japanese (Japan)"
+    }
+  },
+  {
+    "voiceId": "en-US-jonathan",
+    "displayName": "Jonathan (M)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "pt-BR-silvio",
+    "displayName": "Silvio (M)",
+    "locale": "pt-BR",
+    "displayLanguage": "Portuguese",
+    "supportedLocales": {
+      "pt-BR": "Portuguese (Brazil)"
+    }
+  },
+  {
+    "voiceId": "de-DE-ralf",
+    "displayName": "Ralf (M)",
+    "locale": "de-DE",
+    "displayLanguage": "German",
+    "supportedLocales": {
+      "de-DE": "German (Germany)"
+    }
+  },
+  {
+    "voiceId": "en-IN-priya",
+    "displayName": "Priya (F)",
+    "locale": "en-IN",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "hi-IN": "Hindi (India)",
+      "en-IN": "English (India)"
+    }
+  },
+  {
+    "voiceId": "en-UK-theo",
+    "displayName": "Theo (M)",
+    "locale": "en-UK",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-UK": "English (UK)"
+    }
+  },
+  {
+    "voiceId": "tl-PH-eraño",
+    "displayName": "Eraño (M)",
+    "locale": "tl-PH",
+    "displayLanguage": "Tagalog",
+    "supportedLocales": {
+      "tl-PH": "Tagalog (Philippines)"
+    }
+  },
+  {
+    "voiceId": "pl-PL-jacek",
+    "displayName": "Jacek (M)",
+    "locale": "pl-PL",
+    "displayLanguage": "Polish",
+    "supportedLocales": {
+      "pl-PL": "Polish (Poland)"
+    }
+  },
+  {
+    "voiceId": "en-US-will",
+    "displayName": "Will (M)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "hi-IN-aman",
+    "displayName": "Aman (M)",
+    "locale": "hi-IN",
+    "displayLanguage": "Hindi",
+    "supportedLocales": {
+      "hi-IN": "Hindi (India)"
+    }
+  },
+  {
+    "voiceId": "en-US-amara",
+    "displayName": "Amara (F)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-UK-mason",
+    "displayName": "Mason (M)",
+    "locale": "en-UK",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-UK": "English (UK)"
+    }
+  },
+  {
+    "voiceId": "en-IN-pooja",
+    "displayName": "Pooja (F)",
+    "locale": "en-IN",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "id-ID": "Indonesian (Indonesia)",
+      "te-IN": "Telugu (India)",
+      "vi-VN": "Vietnamese (Vietnam)",
+      "kn-IN": "Kannada (India)",
+      "hi-IN": "Hindi (India)",
+      "ta-IN": "Tamil (India)",
+      "ms-MY": "Malay (Malaysia)",
+      "en-IN": "English (India)",
+      "hi-LATN": "Hinglish (India)"
+    }
+  },
+  {
+    "voiceId": "es-ES-javier",
+    "displayName": "Javier (M)",
+    "locale": "es-ES",
+    "displayLanguage": "Spanish",
+    "supportedLocales": {
+      "ar-XA": "Arabic (XA)",
+      "ms-MY": "Malay (Malaysia)",
+      "de-DE": "German (Germany)",
+      "it-IT": "Italian (Italy)",
+      "ro-RO": "Romanian (Romania)",
+      "es-MX": "Spanish (Mexico)",
+      "id-ID": "Indonesian (Indonesia)",
+      "bg-BG": "Bulgarian (Bulgaria)",
+      "cs-CZ": "Czech (Czech Republic)",
+      "nl-BE": "Dutch (Belgium)",
+      "es-ES": "Spanish (Spain)"
+    }
+  },
+  {
+    "voiceId": "ta-IN-karthikeyan",
+    "displayName": "Karthikeyan (M)",
+    "locale": "ta-IN",
+    "displayLanguage": "Tamil",
+    "supportedLocales": {
+      "hi-IN": "Hindi (India)",
+      "ml-IN": "Malayalam (India)",
+      "gu-IN": "Gujarati (India)",
+      "ta-IN": "Tamil (India)",
+      "hi-LATN": "Hinglish (India)"
+    }
+  },
+  {
+    "voiceId": "pt-BR-heitor",
+    "displayName": "Heitor (M)",
+    "locale": "pt-BR",
+    "displayLanguage": "Portuguese",
+    "supportedLocales": {
+      "pt-BR": "Portuguese (Brazil)"
+    }
+  },
+  {
+    "voiceId": "fr-CA-alexis",
+    "displayName": "Alexis (M)",
+    "locale": "fr-CA",
+    "displayLanguage": "French",
+    "supportedLocales": {
+      "fr-CA": "French (Canada)"
+    }
+  },
+  {
+    "voiceId": "en-US-edmund",
+    "displayName": "Edmund (M)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "hi-IN-ayushi",
+    "displayName": "Ayushi (F)",
+    "locale": "hi-IN",
+    "displayLanguage": "Hindi",
+    "supportedLocales": {
+      "te-IN": "Telugu (India)",
+      "gu-IN": "Gujarati (India)",
+      "hi-IN": "Hindi (India)",
+      "hi-LATN": "Hinglish (India)"
+    }
+  },
+  {
+    "voiceId": "en-IN-anusha",
+    "displayName": "Anusha (F)",
+    "locale": "en-IN",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "hi-IN": "Hindi (India)",
+      "en-IN": "English (India)",
+      "hi-LATN": "Hinglish (India)"
+    }
+  },
+  {
+    "voiceId": "en-US-madison",
+    "displayName": "Madison (F)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "en-US-gordon",
+    "displayName": "Gordon (M)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "ro-RO": "Romanian (Romania)",
+      "en-US": "English (US & Canada)"
+    }
+  },
+  {
+    "voiceId": "mr-IN-prajakta",
+    "displayName": "Prajakta (F)",
+    "locale": "mr-IN",
+    "displayLanguage": "Marathi",
+    "supportedLocales": {
+      "mr-IN": "Marathi (India)"
+    }
+  },
+  {
+    "voiceId": "en-UK-bertie",
+    "displayName": "Bertie (M)",
+    "locale": "en-UK",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)",
+      "tr-TR": "Turkish (Turkey)",
+      "en-UK": "English (UK)"
+    }
+  },
+  {
+    "voiceId": "es-MX-luisa",
+    "displayName": "Luisa (F)",
+    "locale": "es-MX",
+    "displayLanguage": "Spanish",
+    "supportedLocales": {
+      "es-MX": "Spanish (Mexico)"
+    }
+  },
+  {
+    "voiceId": "zh-CN-tao",
+    "displayName": "Tao (M)",
+    "locale": "zh-CN",
+    "displayLanguage": "Mandarin",
+    "supportedLocales": {
+      "zh-CN": "Mandarin (China)"
+    }
+  },
+  {
+    "voiceId": "en-US-molly",
+    "displayName": "Molly (F)",
+    "locale": "en-US",
+    "displayLanguage": "English",
+    "supportedLocales": {
+      "en-US": "English (US & Canada)"
+    }
+  }
+]

@@ -1,5 +1,40 @@
 # Guardian Engineering Contract
 
+2026-11-21 review fixes: bank outages preserve local approvals/history with explicit unavailable state; Google-connected incident creation requires a contact; calendar approvals include full times and offsets. Existing mock-bank accounts use read-only snapshots. Voice terminal polling and failed-stop feedback are handled. Render defines the separate authenticated bank; its assigned HTTPS URL still requires configuration. Live deployment/provider verification remains pending.
+
+2026-11-21 follow-ups: new incidents have persisted per-event reminder series.
+General check-ins are separate from conditional RBI milestones based on confirmed
+bank receipt date and transaction type. Exact working-day deadlines require a
+bank-confirmed date. Calendar creation is approval-gated, verified per event, and
+preserves partial failures. Live multi-event Calendar verification remains pending.
+
+2026-11-21 sandbox banking: `mock-bank/main.py` is an independent authenticated
+HTTP server with its own SQLite database and distinct per-user synthetic history.
+Guardian uses `app/adapters/bank.py` for account reads and approved, idempotent
+card freezes with read-back verification. Set MOCK_BANK_URL and the shared
+MOCK_BANK_SERVICE_SECRET in both processes. No real bank integration exists.
+
+Multi-user registration update: username signup and password login are available.
+Sessions bind to a user ID. Application services and tool calls isolate storage
+into account-specific SQLite files, preserving legacy data for the operator.
+Agora tool credentials and saved agents are scoped to registered accounts.
+Registered accounts cannot use the operator's Google connection. Per-user Google
+OAuth and trusted-contact settings are implemented; verified email and password recovery remain pending.
+
+Authentication update: dashboard bearer-token auth is removed. A provisioned
+single operator logs in with a salted scrypt password and receives a revocable
+HttpOnly session cookie. SQLite enforces idle/absolute expiry and CSRF checks.
+`python -m app.manage` provisions/resets the account and revokes all sessions.
+Agora retains a separate server-to-server credential without approval powers.
+Public registration and multi-tenant data ownership are not implemented.
+
+Latest implementation update: optional Google OAuth Gmail/Calendar adapters,
+snapshot-bound external approvals, read-back verification, conservative failure
+handling, typed plan dependencies and per-process POST rate limiting are now
+implemented. See `docs/integrations.md`. Google live verification and the full
+voice-to-tools demo remain pending. Shared demo authentication remains a
+single-user limitation; do not mark production multi-user security complete.
+
 This file governs engineering work in this repository. Read it before changing project files. Baseline was empty when first inspected on 2026-11-19; implementation now includes a React/Vite frontend shell, a FastAPI backend, and a local SQLite sandbox incident workflow. Provider voice integrations are still pending. Keep this status current; do not describe planned capabilities as implemented.
 
 ## Product and delivery goal
@@ -148,6 +183,14 @@ A good-looking interface or successful voice exchange alone is not completion.
 
 ## Current implementation status (2026-11-19)
 
+Readability refactor (2026-11-20): `app/main.py` now assembles routers from
+`app/api/`. Incident and voice behavior lives in `app/services/`, persistence in
+`app/database.py`, request validation in `app/schemas.py`, and authentication in
+`app/security.py`. The frontend separates app bootstrap, dashboard composition,
+shared types, the voice lifecycle hook, and the pending-approval component.
+These moves preserve the existing routes, queries, approval policy, and provider
+configuration. Test database overrides now target `app.database.DB_PATH`.
+
 2026-11-20 diagnostics: voice sessions have authenticated, persisted event timelines with allowlisted event names only, capped at 1,000 per session and pruned after seven days on startup. The frontend polls diagnostics/provider status every ten seconds and exposes a diagnostics panel. Client events are self reported; they do not verify audible speech, ASR accuracy, agent correctness, or tool execution. Conversation contents and credentials are excluded from these events.
 
 2026-11-20 tool foundation: `backend/app/tools.py` exposes all eight tool names through authenticated schema discovery and invocation endpoints. Inputs reject extra fields; sensitive calls expose existing approval requests instead of accepting model approval. Incident creation supports persisted idempotency keys. Six backend tests cover the existing workflow plus registry validation, all tool calls, approval bypass rejection, and duplicate incident prevention. Agora tool calling, multi-user scope, dedicated orchestration, and externally delivered notifications remain pending. Tool results currently use a shared envelope with dictionary payloads; per-tool output models are still required for the full contract.
@@ -161,4 +204,8 @@ Agent tools update (2026-11-20): Agora agent definitions expose the eight regist
 
 Managed LLM update (2026-11-20): Agora rejected Vercel Gateway as an unapproved OpenAI endpoint and rejected `custom` as an unsupported vendor in the saved-agent API. The configured voice agent now uses Agora-managed OpenAI `gpt-4o-mini`; Murf Falcon remains BYOK. The saved-agent payload validates locally with all eight tools. A live session and tool execution after this change remain unverified.
 
-Deployment preparation (2026-11-20): `render.yaml` defines a free API and static dashboard. `VITE_API_URL` selects the frontend backend URL at build time; `GUARDIAN_FRONTEND_ORIGINS` adds explicit comma-separated CORS origins. Free hosting uses ephemeral SQLite and shared demo authentication; it is not a production deployment. Frontend production build and nine mocked backend tests passed locally. Remote deployment and live voice/tool verification are pending Render account setup.
+Deployment (2026-11-20): `render.yaml` defines a free API and static dashboard, which the user has deployed to Render. `VITE_API_URL` selects the frontend backend URL at build time; `GUARDIAN_FRONTEND_ORIGINS` adds explicit comma-separated CORS origins. Free hosting uses ephemeral SQLite and shared demo authentication; it is not a production deployment. Frontend production build and ten mocked backend tests passed locally. Live voice is user-confirmed; live voice-triggered tool execution remains unverified.
+
+Current follow-up (2026-11-20): the user confirmed the online Render voice conversation is working. The approval dashboard now has a pending-approval feed for incidents created outside the manual form, and the voice prompt reinforces the selected reply language; those latest local changes have not been pushed. Live Agora tool invocation through an actual voice conversation remains unverified. `docs/demo-runbook.md` describes the demo sequence and evidence limits. External email delivery, Google Calendar, durable storage, production authentication, rate limiting, and richer orchestration/verification remain pending.
+
+Review fixes: agent tool calls use a separate `GUARDIAN_AGENT_TOOL_TOKEN`; approval input requires a Boolean, expired requests are removed from the queue, and declined plans are marked incomplete. Voice start persists the provider ID before querying status, and polling cannot overwrite a stopped session. `GUARDIAN_DB_PATH` can point to a provisioned persistent disk. The shared demo identity, production rate limiting, disk provisioning, and live voice verification still require work.

@@ -11,4 +11,7 @@ dist/
 .npm-cache/
 .playwright-cli/
 *.log
+backend/logs/
+mock-bank/logs/
 *.tsbuildinfo
+.vscode

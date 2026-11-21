@@ -1,5 +1,18 @@
 services:
   - type: web
+    name: guardian-mock-bank
+    runtime: python
+    plan: free
+    rootDir: mock-bank
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: MOCK_BANK_SERVICE_SECRET
+        generateValue: true
+  - type: web
     name: guardian-api
     runtime: python
     plan: free
@@ -10,7 +23,18 @@ services:
     envVars:
       - key: PYTHON_VERSION
         value: 3.12.8
-      - key: DEMO_API_TOKEN
+      - key: MOCK_BANK_URL
+        sync: false
+      - key: MOCK_BANK_SERVICE_SECRET
+        fromService:
+          name: guardian-mock-bank
+          type: web
+          envVarKey: MOCK_BANK_SERVICE_SECRET
+      - key: GUARDIAN_COOKIE_SECURE
+        value: "true"
+      - key: GUARDIAN_AGENT_TOOL_TOKEN
+        sync: false
+      - key: GUARDIAN_DB_PATH
         sync: false
       - key: AGORA_APP_ID
         sync: false
@@ -26,16 +50,26 @@ services:
         sync: false
       - key: GUARDIAN_FRONTEND_ORIGINS
         sync: false
+      - key: GUARDIAN_FRONTEND_URL
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
+      - key: GOOGLE_TOKEN_ENCRYPTION_KEY
+        sync: false
       - key: MURF_VOICE_ID
-        value: hi-IN-rachna
+        value: en-US-natalie
       - key: MURF_LOCALE
-        value: hi-IN
+        value: en-US
       - key: GUARDIAN_ASR_LANGUAGE
-        value: hi
+        value: en
       - key: GUARDIAN_DEFAULT_LANGUAGE_LABEL
-        value: Hindi
+        value: English — Natalie
       - key: GUARDIAN_DEFAULT_REPLY_LANGUAGE
-        value: Hindi
+        value: English
       - key: GUARDIAN_DEFAULT_VOICE_PROFILE
         value: default
   - type: web
